@@ -23,6 +23,8 @@ import subprocess
 import sys
 import uuid
 
+from rally_openstack import osclients
+
 from rally import api
 from rally.ui import utils
 
@@ -164,8 +166,14 @@ class SetUpStep(Step):
             self.result["status"] = Status.ERROR
             return
 
-        credentials = deployment.get_credentials_for("openstack")["admin"]
-        clients = credentials.clients()
+        credentials = None
+        for platform, creds in deployment.to_dict()["credentials"].items():
+            if platform == "openstack":
+                credentials = creds[0]["admin"]
+        if credentials is None:
+            return Status.ERROR, "There is no openstack credentials."
+
+        clients = osclients.Clients(credentials)
 
         if self.args.ctx_create_resources:
             # If the 'ctx-create-resources' arg is provided, delete images and
@@ -508,6 +516,7 @@ def main():
     parser.add_argument("--ctx-create-resources", action="store_true",
                         help="Make Tempest context create needed resources "
                              "for the tests.")
+    return
 
     args = parser.parse_args()
 
@@ -522,6 +531,7 @@ def main():
             if step.result["status"] == Status.PASS]) == len(steps):
         return 0
     return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

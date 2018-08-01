@@ -161,7 +161,7 @@ class TaskCommandsTestCase(test.TestCase):
     def test_load_task_including_other_template(self):
         other_template_path = os.path.join(
             os.path.dirname(rally.__file__), os.pardir,
-            "samples/tasks/scenarios/nova/boot.json")
+            "samples/tasks/scenarios/dummy/dummy.json")
         input_task = "{%% include \"%s\" %%}" % os.path.basename(
             other_template_path)
         expect = self.task._load_and_validate_task(self.real_api,
@@ -347,10 +347,12 @@ class TaskCommandsTestCase(test.TestCase):
         self.assertRaises(exceptions.InvalidArgumentsException,
                           self.task.status, None)
 
-    @ddt.data({"iterations_data": False, "has_output": True},
-              {"iterations_data": True, "has_output": False})
+    @ddt.data({"iterations_data": False, "has_output": True,
+               "filters": None},
+              {"iterations_data": True, "has_output": False,
+               "filters": ["scenario=fake_name", "sla_failures"]})
     @ddt.unpack
-    def test_detailed(self, iterations_data, has_output):
+    def test_detailed(self, iterations_data, has_output, filters):
         test_uuid = "c0d874d4-7195-4fd5-8688-abe82bfad36f"
         detailed_value = {
             "id": "task", "uuid": test_uuid,
@@ -485,7 +487,8 @@ class TaskCommandsTestCase(test.TestCase):
                 "additive": [], "complete": []}
         self.fake_api.task.get.return_value = detailed_value
         self.task.detailed(self.fake_api, test_uuid,
-                           iterations_data=iterations_data)
+                           iterations_data=iterations_data,
+                           filters=filters)
         self.fake_api.task.get.assert_called_once_with(
             task_id=test_uuid, detailed=True)
 
@@ -1114,33 +1117,32 @@ class TaskCommandsTestCase(test.TestCase):
             "statistics": {"durations": mock.ANY}
         }
 
-        results = [
-            {"hooks": [{"config": {
-                "name": "foo",
-                "args": {"arg1": "v1"},
-                "description": "descr",
-                "trigger": {"name": "t",
-                            "args": {"a2", "v2"}}}}],
-             "key": {"name": workload["name"],
-                     "description": workload["description"],
-                     "pos": workload["position"],
-                     "kw": {
-                         "args": workload["args"],
-                         "runner": {"type": "constant", "time": 3},
-                         "hooks": [{"name": "foo",
-                                    "args": {"arg1": "v1"},
-                                    "description": "descr",
-                                    "trigger": {
-                                        "name": "t",
-                                        "args": {"a2", "v2"}
-                                    }}],
-                         "sla": workload["sla"],
-                         "context": workload["contexts"]}},
-             "sla": workload["sla_results"]["sla"],
-             "result": workload["data"],
-             "full_duration": workload["full_duration"],
-             "load_duration": workload["load_duration"],
-             "created_at": "2017-01-07T07:03:01"}
+        results = [{
+            "hooks": [{
+                "config": {
+                    "name": "foo",
+                    "args": {"arg1": "v1"},
+                    "description": "descr",
+                    "trigger": {"name": "t", "args": {"a2", "v2"}}}}],
+            "key": {
+                "name": workload["name"],
+                "description": workload["description"],
+                "pos": workload["position"],
+                "kw": {
+                    "args": workload["args"],
+                    "runner": {"type": "constant", "time": 3},
+                    "hooks": [{
+                        "name": "foo",
+                        "args": {"arg1": "v1"},
+                        "description": "descr",
+                        "trigger": {"name": "t", "args": {"a2", "v2"}}}],
+                    "sla": workload["sla"],
+                    "context": workload["contexts"]}},
+            "sla": workload["sla_results"]["sla"],
+            "result": workload["data"],
+            "full_duration": workload["full_duration"],
+            "load_duration": workload["load_duration"],
+            "created_at": "2017-01-07T07:03:01"}
         ]
         mock_loads.return_value = results
         ret = self.task._load_task_results_file(self.fake_api, task_file)
@@ -1149,6 +1151,9 @@ class TaskCommandsTestCase(test.TestCase):
             "title": "Task loaded from a file.",
             "description": "Auto-ported from task format V1.",
             "uuid": "n/a",
+            "env_uuid": "n/a",
+            "env_name": "n/a",
+            "status": "finished",
             "tags": [],
             "subtasks": [{
                 "title": "A SubTask",
@@ -1163,6 +1168,8 @@ class TaskCommandsTestCase(test.TestCase):
         task_file = "/tmp/task.json"
         results = {
             "tasks": [{
+                "env_uuid": "env-uuid-1",
+                "env_name": "env-name-1",
                 "subtasks": [{
                     "workloads": [{
                         "contexts": "contexts",
@@ -1179,6 +1186,8 @@ class TaskCommandsTestCase(test.TestCase):
         mock_loads.return_value = results
         ret = self.task._load_task_results_file(self.fake_api, task_file)
         self.assertEqual([{
+            "env_uuid": "env-uuid-1",
+            "env_name": "env-name-1",
             "subtasks": [{
                 "workloads": [{
                     "args": {},
