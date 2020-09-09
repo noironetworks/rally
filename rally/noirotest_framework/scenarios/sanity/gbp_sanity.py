@@ -12,7 +12,7 @@ from rally.plugins.openstack.scenarios.neutron import utils as neutron_utils
 @validation.add("required_services", services=[consts.Service.NOVA, consts.Service.NEUTRON])
 @validation.add("required_platform", platform="openstack", users=True)
 @scenario.configure(name="ScenarioPlugin.gbp_sanity", context={"cleanup@openstack": ["nova", "neutron"],
-                                                               "keypair@openstack": {}, "allow_ssh@openstack": None}, platform="openstack")
+                    "keypair@openstack": {}, "allow_ssh@openstack": None}, platform="openstack")
 
 class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.GBPScenario, neutron_utils.NeutronScenario,
                 nova_utils.NovaScenario, scenario.OpenStackScenario):
@@ -54,7 +54,7 @@ class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.G
                                                                                "icmp", "bi", "PR-ICMP", shared=True)
         if dual_stack:
             cls_icmpv6_id, rule_icmpv6_id = self.create_gbp_classifier_and_policy_rule(gbp_admin, act_id, "ICMPV6",
-                                                                                       "58", "bi", "PR-ICMPV6", shared=True)
+                                                       "58", "bi", "PR-ICMPV6", shared=True)
 
         cls_tcp_id, rule_tcp_id = self.create_gbp_classifier_and_policy_rule(gbp_admin, act_id, "TCP", "tcp", "bi",
                                                                              "PR-TCP", port_rang="20:2000", shared=True)
@@ -97,7 +97,7 @@ class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.G
         print "Create External Segment as shared under tenant-Admin\n"
         ext_seg1 = self.create_gbp_external_segment(gbp_admin, L3OUT1,
                                                     **{"subnet_id": ext_sub1.get("subnet")["id"], "external_routes": [
-                                                        {"destination": "0.0.0.0/0", "nexthop": None}], "shared": True})
+                                                      {"destination": "0.0.0.0/0", "nexthop": None}], "shared": True})
 
         print "Create External Policy in tenant MANDRAKE\n"
         ext_pol1 = self.create_gbp_external_policy(gbp1, L3OUT1_NET, **{"external_segments": [ext_seg1]})

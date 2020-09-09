@@ -10,7 +10,7 @@ from rally.plugins.openstack.scenarios.nova import utils as nova_utils
 @validation.add("required_services", services=[consts.Service.NOVA, consts.Service.NEUTRON])
 @validation.add("required_platform", platform="openstack", users=True)
 @scenario.configure(name="ScenarioPlugin.ml2_sanity", context={"cleanup@openstack": ["nova", "neutron"],
-                                                               "keypair@openstack": {}, "allow_ssh@openstack": None}, platform="openstack")
+                    "keypair@openstack": {}, "allow_ssh@openstack": None}, platform="openstack")
 
 class ML2Sanity(osutils.OSScenario, neutron_utils.NeutronScenario, nova_utils.NovaScenario,
                 scenario.OpenStackScenario):
@@ -136,16 +136,16 @@ class ML2Sanity(osutils.OSScenario, neutron_utils.NeutronScenario, nova_utils.No
         sub_list2 = [sub3]
         if dual_stack:
             sub3v6 = self.create_subnet_with_pool(net3,
-                                                  {"subnetpool_id": subpool1v6.get("subnetpool")["id"], "ip_version": "6", "ipv6_ra_mode": "slaac",
-                                                   "ipv6_address_mode": "slaac"}, None)
+                                         {"subnetpool_id": subpool1v6.get("subnetpool")["id"], "ip_version": "6", "ipv6_ra_mode": "slaac",
+                                          "ipv6_address_mode": "slaac"}, None)
             sub_list2.append(sub3v6)
         net4 = self._create_network({})
         sub4 = self.create_subnet_with_pool(net4, {"subnetpool_id": subpool1.get("subnetpool")["id"], "ip_version": "4"}, None)
         sub_list2.append(sub4)
         if dual_stack:
             sub4v6 = self.create_subnet_with_pool(net4,
-                                                  {"subnetpool_id": subpool1v6.get("subnetpool")["id"], "ip_version": "6", "ipv6_ra_mode": "slaac",
-                                                   "ipv6_address_mode": "slaac"}, None)
+                                         {"subnetpool_id": subpool1v6.get("subnetpool")["id"], "ip_version": "6", "ipv6_ra_mode": "slaac",
+                                          "ipv6_address_mode": "slaac"}, None)
             sub_list2.append(sub4v6)
 
         print "Create Router for ML2 Tenant OCTON\n"
@@ -250,14 +250,14 @@ class ML2Sanity(osutils.OSScenario, neutron_utils.NeutronScenario, nova_utils.No
         sub_list3 = [sub5]
         if dual_stack:
             sub5v6 = self.create_subnet_with_pool(net5, {"subnetpool_id": spsv6.get("subnetpool")["id"], "ip_version": "6", "ipv6_ra_mode": "slaac",
-                                                         "ipv6_address_mode": "slaac"}, None)
+                                                "ipv6_address_mode": "slaac"}, None)
             sub_list3.append(sub5v6)
         net6 = self._create_network({})
         sub6 = self.create_subnet_with_pool(net6, {"subnetpool_id": sps.get("subnetpool")["id"], "ip_version": "4"}, None)
         sub_list3.append(sub6)
         if dual_stack:
             sub6v6 = self.create_subnet_with_pool(net6, {"subnetpool_id": spsv6.get("subnetpool")["id"], "ip_version": "6", "ipv6_ra_mode": "slaac",
-                                                         "ipv6_address_mode": "slaac"}, None)
+                                                "ipv6_address_mode": "slaac"}, None)
             sub_list3.append(sub6v6)
 
         print "Install VM for the Tenant GARTH\n"
