@@ -16,7 +16,7 @@ class GBPScenario(scenario.OpenStackScenario):
                    password, tenant):
 
         cred = {'username': username, 'password': password, 'tenant_name': tenant,
-                'auth_url': "http://%s/identity" % ostack_controller}
+                'auth_url': "http://%s:5000/v3/" % ostack_controller}
         auth = identity.Password(auth_url=cred['auth_url'],
                                  username=username,
                                  password=password,
@@ -372,7 +372,7 @@ class GBPScenario(scenario.OpenStackScenario):
             for arg, val in kwargs.items():
                 policy_rule_set[arg] = val
             body = {"policy_rule_set": policy_rule_set}
-            gbp_client.create_gbp_policy_rule_set(body)
+            gbp_client.create_policy_rule_set(body)
         except Exception as e:
             _log.error("\nException Error: %s\n" % e)
             _log.error("Creating Policy RuleSet = %s, failed" % name)

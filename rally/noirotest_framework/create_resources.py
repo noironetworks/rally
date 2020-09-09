@@ -1,8 +1,8 @@
+from rally.plugins.openstack import scenario
 from rally.noirotest_framework import gbputils
-from rally.noirotest_framework import osutils
 from rally.noirotest_framework.osutils import TestError
 
-class CreateResources(gbputils.GBPScenario, osutils.OSScenario):
+class CreateResources(gbputils.GBPScenario, scenario.OpenStackScenario):
 
     def create_gbp_policy_rule_set_east_west(self, gbp1):
         print("Create GBP policy action")
@@ -47,24 +47,12 @@ class CreateResources(gbputils.GBPScenario, osutils.OSScenario):
         prs_norule_id = self.create_gbp_policy_ruleset("demo_ruleset_norule")
         policy_ruleset_ids.update({"norule_id": prs_norule_id})
 
-        return policy_ruleset_ids
-
-    def create_gbp_object_for_new_user(self, controller_ip, project_name, username, password, tenantname):
-        project = self._create_project(project_name, 'default')
-        user = self._create_user(username, password, project.id, "default", True, "Admin")
-        dic = self.context
-        new_user = dic.get("users")[0]
-        new_user.get("credential").update({'username': username, 'tenant_name': tenantname, 'password': password})
-        self.context.get("users").append(new_user)
-        self._change_client(1, self.context, None, None)
-        gbp1 = self.gbp_client(controller_ip, username, password, tenantname)
-        key_name = self.context["user"]["keypair"]["name"]
-
-        return gbp1, key_name, user, project
+        return gbp1, key_name, policy_ruleset_ids
 
     def create_gbp_classifier_and_policy_rule(self, gbp_obj, act_id, classifier_name,
                                               protocol, direction, policy_rule_name,
                                               port_rang=None, shared=False):
+
         if port_rang:
             self.create_gbp_policy_classifier(gbp_obj, classifier_name,
                                               **{"direction": direction, "protocol": protocol, "port_range": port_rang,
@@ -72,7 +60,7 @@ class CreateResources(gbputils.GBPScenario, osutils.OSScenario):
         else:
             self.create_gbp_policy_classifier(gbp_obj, classifier_name,
                                                      **{"direction": direction, "protocol": protocol, "shared": shared})
-        cls_id = self.verify_gbp_policy_classifier(gbp_obj, "demo_class_icmp")
+        cls_id = self.verify_gbp_policy_classifier(gbp_obj, classifier_name)
         self.create_gbp_policy_rule(gbp_obj, policy_rule_name, cls_id, act_id, "uuid",
                                                 **{"shared": shared})
         rule_id = self.verify_gbp_policy_rule(gbp_obj, policy_rule_name)
@@ -85,21 +73,11 @@ class CreateResources(gbputils.GBPScenario, osutils.OSScenario):
 
         return prs_id
 
-    def boot_server(self, port, key_name, image, flavor):
-        nics = [{"port-id": port}]
-        kwargs = {}
-        kwargs.update({'nics': nics})
-        kwargs.update({'key_name': key_name})
-        vm = self._boot_server(image, flavor, False, **kwargs)
-        self.sleep_between(30, 35)
-        return vm
-
-    def create_resources_for_north_south_tests(self, gbp_ad, gbp, key_name, image, flavor, external_seg2=False,
-                                               nat_pool2=False, ext_pol2=False):
+    def create_resources_for_north_south_tests(self, gbp_ad, gbp, key_name, image, flavor, external_seg2=False):
         ext_net1, ext_net2, ext_sub1, ext_sub2, ext_sub3 = self.create_external_netwok_subnet()
         ext_net_list = [ext_net1, ext_net2]
         ext_sub_list = [ext_sub1, ext_sub2, ext_sub3]
-        ext_seg = self.create_gbp_external_segment(gbp_ad, "L3OUT1", **{"subnet_id": ext_sub1.id, "external_routes": [
+        ext_seg = self.create_gbp_external_segment(gbp_adm, "L3OUT1", **{"subnet_id": ext_sub1.id, "external_routes": [
             {"destination": "0.0.0.0/0", "nexthop": None}], "shared": True})
 
         print("Cretaing portgroups and gbp L3 and L2 Policy")
@@ -144,32 +122,7 @@ class CreateResources(gbputils.GBPScenario, osutils.OSScenario):
         if external_seg2:
             return ext_net_list, ext_sub_list, vm_list, l3p, defaultl3p, nat_pool, prs_icmp_tcp_id
 
-        if nat_pool2:
-            return ext_net_list, ext_sub_list, vm_list, ext_seg, nat_pool
-
-        if ext_pol2:
-            return  ext_net_list, ext_sub_list, vm_list, ext_pol, ext_seg, prs_icmp_tcp_id
-
         return ext_net_list, ext_sub_list, vm_list
-
-    def create_external_netwok_subnet(self, gbp_adm):
-        ext_net1 = self._admin_create_network('L3OUT1', {"shared": True, "router": True,
-                                                         "apic:distinguished_names": {"type": "dict",
-                                                                                      "ExternalNetwork": "uni/tn-common/out-Management-Out/instP-data_ext_pol"}})
-        ext_sub1 = self._admin_create_subnet(ext_net1, {"cidr": '50.50.50.0/24', "no_dhcp": True}, None)
-        ext_sub2 = self._admin_create_subnet(ext_net1,
-                                             {"cidr": '55.55.55.0/24', "no_dhcp": True, "apic:snat_host_pool": True},
-                                             None)
-
-        ext_net2 = self._admin_create_network('L3OUT2', {"shared": True, "router": True,
-                                                         "apic:distinguished_names": {"type": "dict",
-                                                                                      "ExternalNetwork": "uni/tn-common/out-Datacenter-Out/instP-data_ext_pol"},
-                                                         "apic:nat_type": ""})
-        ext_sub3 = self._admin_create_subnet(ext_net2,
-                                             {"cidr": '55.55.55.0/24', "no_dhcp": True, "apic:snat_host_pool": True},
-                                             None)
-
-        return ext_net1, ext_net2, ext_sub1, ext_sub2, ext_sub3
 
     def cleanup(self, vm_list, gbp_ad):
         for vm in vm_list:
