@@ -11,15 +11,15 @@ from rally.plugins.openstack.scenarios.neutron import utils as neutron_utils
 
 @validation.add("required_services", services=[consts.Service.NOVA, consts.Service.NEUTRON])
 @validation.add("required_platform", platform="openstack", users=True)
-@scenario.configure(name="ScenarioPlugin.gbp_sanity", context={"cleanup@openstack": ["nova", "neutron"], 
-                    "keypair@openstack": {}, "allow_ssh@openstack": None}, platform="openstack")
+@scenario.configure(name="ScenarioPlugin.gbp_sanity", context={"cleanup@openstack": ["nova", "neutron"],
+                                                               "keypair@openstack": {}, "allow_ssh@openstack": None}, platform="openstack")
 
-class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.GBPScenario, neutron_utils.NeutronScenario, 
+class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.GBPScenario, neutron_utils.NeutronScenario,
                 nova_utils.NovaScenario, scenario.OpenStackScenario):
 
-    def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, L3OUT1_VRF, L3OUT2, 
+    def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, L3OUT1_VRF, L3OUT2,
             L3OUT2_NET, L3OUT2_VRF, ext_rtr, extrtr_ip1, extrtr_ip2, dual_stack):
-	
+
         print "\nCreate Openstack Tenant MANDRAKE for GBP\n"
         gbp_admin = self.gbp_client(controller_ip, "admin", "noir0123", "admin")
         pro1, user1, new_user = self.create_rally_client("MANDRAKE", "mandrake", self.context)
@@ -54,7 +54,7 @@ class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.G
                                                                                "icmp", "bi", "PR-ICMP", shared=True)
         if dual_stack:
             cls_icmpv6_id, rule_icmpv6_id = self.create_gbp_classifier_and_policy_rule(gbp_admin, act_id, "ICMPV6",
-                                                       "58", "bi", "PR-ICMPV6", shared=True)
+                                                                                       "58", "bi", "PR-ICMPV6", shared=True)
 
         cls_tcp_id, rule_tcp_id = self.create_gbp_classifier_and_policy_rule(gbp_admin, act_id, "TCP", "tcp", "bi",
                                                                              "PR-TCP", port_rang="20:2000", shared=True)
@@ -83,55 +83,55 @@ class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.G
         vm3 = self.boot_server(port3, image, flavor)
         vm4 = self.boot_server(port4, image, flavor)
 
-	p1 = self._show_port({"port": {"id": port1}})
-	p2 = self._show_port({"port": {"id": port2}})
-	p3 = self._show_port({"port": {"id": port3}})
-	p4 = self._show_port({"port": {"id": port4}})
-	ip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
+        p1 = self._show_port({"port": {"id": port1}})
+        p2 = self._show_port({"port": {"id": port2}})
+        p3 = self._show_port({"port": {"id": port3}})
+        p4 = self._show_port({"port": {"id": port4}})
+        ip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
         ip2 = p2.get('port', {}).get('fixed_ips')[0].get('ip_address')
-	ip3 = p3.get('port', {}).get('fixed_ips')[0].get('ip_address')
+        ip3 = p3.get('port', {}).get('fixed_ips')[0].get('ip_address')
         ip4 = p4.get('port', {}).get('fixed_ips')[0].get('ip_address')
-	
+
         print "Create Shared External Network for ML2 Tenants\n"
         ext_net1, ext_sub1, ext_sub2 = self.create_external_network1(L3OUT1, L3OUT1_NET)
- 	print "Create External Segment as shared under tenant-Admin\n"
+        print "Create External Segment as shared under tenant-Admin\n"
         ext_seg1 = self.create_gbp_external_segment(gbp_admin, L3OUT1,
                                                     **{"subnet_id": ext_sub1.get("subnet")["id"], "external_routes": [
-                                                      {"destination": "0.0.0.0/0", "nexthop": None}], "shared": True})
-       
-	print "Create External Policy in tenant MANDRAKE\n"
+                                                        {"destination": "0.0.0.0/0", "nexthop": None}], "shared": True})
+
+        print "Create External Policy in tenant MANDRAKE\n"
         ext_pol1 = self.create_gbp_external_policy(gbp1, L3OUT1_NET, **{"external_segments": [ext_seg1]})
         print "Updating L3Policy to attach to External Segment in tenant MANDRAKE\n"
         self.update_gbp_l3policy(gbp1, l2p1_impl3p, "uuid", **{"external_segments": ext_seg1})
-	self.update_gbp_external_policy(gbp1, ext_pol1, "uuid", [prs_icmp_tcp_id])
-        self.update_gbp_policy_target_group(gbp1, reg_ptg, "uuid", None, [prs_icmp_tcp_id])	
+        self.update_gbp_external_policy(gbp1, ext_pol1, "uuid", [prs_icmp_tcp_id])
+        self.update_gbp_policy_target_group(gbp1, reg_ptg, "uuid", None, [prs_icmp_tcp_id])
 
         print "Create & Attach FIP to VMs for the Tenant MANDRAKE\n"
         fip1 = self._attach_floating_ip(vm1, ext_net1.get("network"))
         fip2 = self._attach_floating_ip(vm2, ext_net1.get("network"))
         fip3 = self._attach_floating_ip(vm3, ext_net1.get("network"))
         fip4 = self._attach_floating_ip(vm4, ext_net1.get("network"))
-	self.sleep_between(10, 15)
-	
-	command1 = self.command_for_start_http_server()
+        self.sleep_between(10, 15)
+
+        command1 = self.command_for_start_http_server()
         command2 = self.command_for_icmp_tcp_traffic(ip1)
         command3 = self.command_for_icmp_tcp_traffic(ip2)
-	command4 = self.command_for_icmp_tcp_traffic(ip3)
+        command4 = self.command_for_icmp_tcp_traffic(ip3)
         command5 = self.command_for_icmp_tcp_traffic(ip4)
-	command6 = self.command_for_stop_http_server()
-	command7 = self.command_for_icmp_tcp_traffic(extrtr_ip1)
+        command6 = self.command_for_stop_http_server()
+        command7 = self.command_for_icmp_tcp_traffic(extrtr_ip1)
         command8 = self.command_for_icmp_tcp_traffic(extrtr_ip2)
-	command9 = self.command_for_icmp_tcp_traffic_from_ext_rtr(fip1["ip"])
+        command9 = self.command_for_icmp_tcp_traffic_from_ext_rtr(fip1["ip"])
         command10 = self.command_for_icmp_tcp_traffic_from_ext_rtr(fip2["ip"])
-	command11 = self.command_for_icmp_tcp_traffic_from_ext_rtr(fip3["ip"])
+        command11 = self.command_for_icmp_tcp_traffic_from_ext_rtr(fip3["ip"])
         command12 = self.command_for_icmp_tcp_traffic_from_ext_rtr(fip4["ip"])
- 
-	print "INTRA-EPG traffic between VMs in an AutoPTG MANDRAKE\n"
+
+        print "INTRA-EPG traffic between VMs in an AutoPTG MANDRAKE\n"
         print "Sending Traffic from VM2 in GBP-tenant MANDRAKE\n"
-	self._remote_command("root", "noir0123", fip2["ip"], command1, vm2)
+        self._remote_command("root", "noir0123", fip2["ip"], command1, vm2)
         self._remote_command("root", "noir0123", fip2["ip"], command4, vm2)
-	self._remote_command("root", "noir0123", fip2["ip"], command6, vm2)
-	print "Sending Traffic from VM3 in GBP-tenant MANDRAKE\n"
+        self._remote_command("root", "noir0123", fip2["ip"], command6, vm2)
+        print "Sending Traffic from VM3 in GBP-tenant MANDRAKE\n"
         self._remote_command("root", "noir0123", fip3["ip"], command1, vm3)
         self._remote_command("root", "noir0123", fip3["ip"], command3, vm3)
         self._remote_command("root", "noir0123", fip3["ip"], command6, vm3)
@@ -140,10 +140,10 @@ class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.G
         self.update_intra_bd_ptg_by_contract(gbp1, reg_ptg, l2p1_autoptg, prs_icmp_tcp_id)
         print "INTRA-BD traffic between VMs across two EPGs\n"
         print "Sending Traffic from VM1 in GBP-tenant MANDRAKE\n"
-	self._remote_command("root", "noir0123", fip1["ip"], command1, vm1)
+        self._remote_command("root", "noir0123", fip1["ip"], command1, vm1)
         self._remote_command("root", "noir0123", fip1["ip"], command3, vm1)
-	self._remote_command("root", "noir0123", fip1["ip"], command4, vm1)
-	self._remote_command("root", "noir0123", fip1["ip"], command5, vm1)
+        self._remote_command("root", "noir0123", fip1["ip"], command4, vm1)
+        self._remote_command("root", "noir0123", fip1["ip"], command5, vm1)
         self._remote_command("root", "noir0123", fip1["ip"], command6, vm1)
 
         print "Apply Contract PRS_ICMP_TCP between inter-BD EPGs by updation\n"
@@ -166,14 +166,14 @@ class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.G
         print "Sending Traffic from VM2 in GBP-tenant MANDRAKE\n"
         self._remote_command("root", "noir0123", fip2["ip"], command7, vm2)
         self._remote_command("root", "noir0123", fip2["ip"], command8, vm2)
-	print "Sending Traffic from VM3 in GBP-tenant MANDRAKE\n"
+        print "Sending Traffic from VM3 in GBP-tenant MANDRAKE\n"
         self._remote_command("root", "noir0123", fip3["ip"], command7, vm3)
         self._remote_command("root", "noir0123", fip3["ip"], command8, vm3)
 
         print "Sending ICMP/TCP Traffic from EXT-RTR to VMs\n"
         self._remote_command_wo_server("noiro", "noir0123", ext_rtr, command9)
         self._remote_command_wo_server("noiro", "noir0123", ext_rtr, command10)
-	self._remote_command_wo_server("noiro", "noir0123", ext_rtr, command11)
+        self._remote_command_wo_server("noiro", "noir0123", ext_rtr, command11)
         self._remote_command_wo_server("noiro", "noir0123", ext_rtr, command12)
 
         print("Create Openstack Tenant BATMAN for GBP\n")
@@ -217,22 +217,22 @@ class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.G
         self.update_gbp_external_policy(gbp2, ext_pol2, "uuid", [prs_icmp_tcp_id])
         self.update_gbp_policy_target_group(gbp2, l2p3_autoptg, "uuid", None, [prs_icmp_tcp_id])
 
-	p5 = self._show_port({"port": {"id": port5}})
+        p5 = self._show_port({"port": {"id": port5}})
         p6 = self._show_port({"port": {"id": port6}})
-	ip5 = p5.get('port', {}).get('fixed_ips')[0].get('ip_address')
+        ip5 = p5.get('port', {}).get('fixed_ips')[0].get('ip_address')
         ip6 = p6.get('port', {}).get('fixed_ips')[0].get('ip_address')
-	
-	print "NoNAT Traffic from BATMAN VMs to External Router\n"
+
+        print "NoNAT Traffic from BATMAN VMs to External Router\n"
         print "Sending Traffic from VM5 in GBP-tenant BATMAN\n"
         self._remote_command("root", "noir0123", ip5, command1, vm5)
-	self._remote_command("root", "noir0123", ip5, command7, vm5)
+        self._remote_command("root", "noir0123", ip5, command7, vm5)
         self._remote_command("root", "noir0123", ip5, command8, vm5)
-	self._remote_command("root", "noir0123", ip5, command6, vm5)
+        self._remote_command("root", "noir0123", ip5, command6, vm5)
         print "Sending Traffic from VM6 in GBP-tenant BATMAN\n"
-	self._remote_command("root", "noir0123", ip6, command1, vm6)
+        self._remote_command("root", "noir0123", ip6, command1, vm6)
         self._remote_command("root", "noir0123", ip6, command7, vm6)
         self._remote_command("root", "noir0123", ip6, command8, vm6)
-	self._remote_command("root", "noir0123", ip6, command6, vm6)
+        self._remote_command("root", "noir0123", ip6, command6, vm6)
 
         print "cleaning up the setup after testing\n"
         for item in [vm5, vm6]:
@@ -240,7 +240,7 @@ class GBPSanity(create_resources.CreateResources, osutils.OSScenario, gbputils.G
         for i, j in [(vm1,fip1), (vm2,fip2), (vm3,fip3), (vm4,fip4)]:
             self._delete_floating_ip(i, j)
             self._delete_server(i)
-	self.cleanup_gbp(gbp_admin)
+        self.cleanup_gbp(gbp_admin)
         self.delete_subnet_pool(subpool1.get("subnetpool")["id"])
         self.delete_address_scope(asc1.get("address_scope")["id"])
         self._admin_delete_network(ext_net1)

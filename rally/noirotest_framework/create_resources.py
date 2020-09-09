@@ -59,10 +59,10 @@ class CreateResources(gbputils.GBPScenario, scenario.OpenStackScenario):
                                                  "shared": shared})
         else:
             self.create_gbp_policy_classifier(gbp_obj, classifier_name,
-                                                     **{"direction": direction, "protocol": protocol, "shared": shared})
+                                              **{"direction": direction, "protocol": protocol, "shared": shared})
         cls_id = self.verify_gbp_policy_classifier(gbp_obj, classifier_name)
         self.create_gbp_policy_rule(gbp_obj, policy_rule_name, cls_id, act_id, "uuid",
-                                                **{"shared": shared})
+                                    **{"shared": shared})
         rule_id = self.verify_gbp_policy_rule(gbp_obj, policy_rule_name)
 
         return cls_id, rule_id
