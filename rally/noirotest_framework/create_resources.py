@@ -5,49 +5,50 @@ from rally.noirotest_framework.osutils import TestError
 class CreateResources(gbputils.GBPScenario, scenario.OpenStackScenario):
 
     def create_gbp_policy_rule_set_east_west(self, gbp1):
-        print("Create GBP policy action")
+
         policy_ruleset_ids = {}
+        print("Create GBP policy action")
         self.create_gbp_policy_action(gbp1, "demo_act", **{"action_type": "allow", "shared": False})
         act_id = self.verify_gbp_policy_action(gbp1, "demo_act")
-        print("Create GBP classifier and rule sets for icmp")
+        print("Create GBP classifier and rule sets for ICMP")
         cls_icmp_id, rule_icmp_id = self.create_gbp_classifier_and_policy_rule(
             gbp1, act_id, "demo_class_icmp", "icmp", "bi", "demo_rule_icmp")
-        prs_icmp_id = self.create_gbp_policy_ruleset("demo_ruleset_icmp", rule_ids=[rule_icmp_id])
+        prs_icmp_id = self.create_gbp_policy_ruleset(gbp1, "demo_ruleset_icmp", rule_ids=[rule_icmp_id])
         policy_ruleset_ids.update({"icmp_id": prs_icmp_id})
 
         print("Create GBP classifier and rule sets for TCP")
         cls_tcp_id, rule_tcp_id = self.create_gbp_classifier_and_policy_rule(
-            gbp1, act_id, "demo_class_tcp", "tcp", "bi", "demo_rule_tcp", port_rang="20:2000")
-        prs_tcp_id = self.create_gbp_policy_ruleset("demo_ruleset_tcp", [rule_tcp_id])
+            gbp1, act_id, "demo_class_tcp", "tcp", "bi", "demo_rule_tcp")
+        prs_tcp_id = self.create_gbp_policy_ruleset(gbp1, "demo_ruleset_tcp", [rule_tcp_id])
         policy_ruleset_ids.update({"tcp_id": prs_tcp_id})
 
         print("Create GBP classifier and rule sets for UDP")
         cls_udp_id, rule_udp_id = self.create_gbp_classifier_and_policy_rule(
             gbp1, act_id, "demo_class_icmp", "udp", "bi", "demo_rule_udp")
-        prs_udp_id = self.create_gbp_policy_ruleset("demo_ruleset_udp", rule_ids=[rule_udp_id])
+        prs_udp_id = self.create_gbp_policy_ruleset(gbp1, "demo_ruleset_udp", rule_ids=[rule_udp_id])
         policy_ruleset_ids.update({"udp_id": prs_udp_id})
 
-        print("Create policy rule set of icmp and tcp")
-        prs_icmp_tcp_id = self.create_gbp_policy_ruleset("demo_ruleset_icmp_tcp", rule_ids=[rule_icmp_id, rule_tcp_id])
-        policy_ruleset_ids.update({"icmp_and_tcp_id": prs_icmp_tcp_id})
+        print("Create policy ruleset of ICMP and TCP")
+        prs_icmp_tcp_id = self.create_gbp_policy_ruleset(gbp1, "demo_ruleset_icmp_tcp", rule_ids=[rule_icmp_id, rule_tcp_id])
+        policy_ruleset_ids.update({"icmp_tcp_id": prs_icmp_tcp_id})
 
-        print("Create policy ruleset of icmp and udp")
-        prs_icmp_udp_id = self.create_gbp_policy_ruleset("demo_ruleset_icmp_udp", rule_ids=[rule_icmp_id, rule_udp_id])
-        policy_ruleset_ids.update({"icmp_and_udp_id": prs_icmp_udp_id})
+        print("Create policy ruleset of ICMP and UDP")
+        prs_icmp_udp_id = self.create_gbp_policy_ruleset(gbp1, "demo_ruleset_icmp_udp", rule_ids=[rule_icmp_id, rule_udp_id])
+        policy_ruleset_ids.update({"icmp_udp_id": prs_icmp_udp_id})
 
-        print("Create policy ruleset of tcp and udp")
-        prs_tcp_udp_id = self.create_gbp_policy_ruleset("demo_ruleset_tcp_udp", rule_ids=[rule_tcp_id, rule_udp_id])
-        policy_ruleset_ids.update({"tcp_and_udp_id": prs_tcp_udp_id})
+        print("Create policy ruleset of TCP and UDP")
+        prs_tcp_udp_id = self.create_gbp_policy_ruleset(gbp1, "demo_ruleset_tcp_udp", rule_ids=[rule_tcp_id, rule_udp_id])
+        policy_ruleset_ids.update({"tcp_udp_id": prs_tcp_udp_id})
 
-        print("Create policy ruleset of icmp, tcp and udp")
-        prs_all_id = self.create_gbp_policy_ruleset("demo_ruleset_all", rule_ids=[rule_icmp_id, rule_tcp_id, rule_udp_id])
+        print("Create policy ruleset for all protocol")
+        prs_all_id = self.create_gbp_policy_ruleset(gbp1, "demo_ruleset_all", rule_ids=[rule_icmp_id, rule_tcp_id, rule_udp_id])
         policy_ruleset_ids.update({"allrule_id": prs_all_id})
 
-        print("Create policy ruleset for norules ")
-        prs_norule_id = self.create_gbp_policy_ruleset("demo_ruleset_norule")
+        print("Create policy ruleset for no rule ")
+        prs_norule_id = self.create_gbp_policy_ruleset(gbp1, "demo_ruleset_norule")
         policy_ruleset_ids.update({"norule_id": prs_norule_id})
 
-        return gbp1, key_name, policy_ruleset_ids
+        return policy_ruleset_ids
 
     def create_gbp_classifier_and_policy_rule(self, gbp_obj, act_id, classifier_name,
                                               protocol, direction, policy_rule_name,
@@ -59,15 +60,16 @@ class CreateResources(gbputils.GBPScenario, scenario.OpenStackScenario):
                                                  "shared": shared})
         else:
             self.create_gbp_policy_classifier(gbp_obj, classifier_name,
-                                              **{"direction": direction, "protocol": protocol, "shared": shared})
+                                                     **{"direction": direction, "protocol": protocol, "shared": shared})
         cls_id = self.verify_gbp_policy_classifier(gbp_obj, classifier_name)
         self.create_gbp_policy_rule(gbp_obj, policy_rule_name, cls_id, act_id, "uuid",
-                                    **{"shared": shared})
+                                                **{"shared": shared})
         rule_id = self.verify_gbp_policy_rule(gbp_obj, policy_rule_name)
 
         return cls_id, rule_id
 
     def create_gbp_policy_ruleset(self, gbp, policy_rule_set_name, rule_ids=[], shared=False):
+
         self.create_gbp_policy_rule_set(gbp, policy_rule_set_name, rule_ids, "uuid", **{"shared": shared})
         prs_id = self.verify_gbp_policy_rule_set(gbp, policy_rule_set_name)
 
@@ -124,10 +126,10 @@ class CreateResources(gbputils.GBPScenario, scenario.OpenStackScenario):
 
         return ext_net_list, ext_sub_list, vm_list
 
-    def cleanup(self, vm_list, gbp_ad):
+    def cleanup(self, vm_list, gbp):
         for vm in vm_list:
             self._delete_server(vm)
-        self.cleanup_gbp(gbp_ad)
+        self.cleanup_gbp(gbp)
 
     def cleanup_resources(self, gbp_ad, vm_list, ext_net_list, fip2, fip1, user, project):
         self._delete_server_with_fip(vm_list[0], fip2)

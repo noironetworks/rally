@@ -106,10 +106,10 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
             self._clients = clients
 
     @atomic.action_timer("nova.admin_boot_server")
-    def _admin_boot_server(self, image, flavor,
+    def _admin_boot_server(self, image, flavor, name,
                            auto_assign_nic=False, **kwargs):
 
-        server_name = self.generate_random_name()
+        server_name = name
 
         if auto_assign_nic and not kwargs.get("nics", False):
             nic = self._pick_random_nic()
@@ -164,6 +164,11 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
         port_create_args["network_id"] = network["network"]["id"]
         port_create_args["name"] = self.generate_random_name()
         return self.admin_clients("neutron").create_port({"port": port_create_args})
+
+    @atomic.action_timer("neutron.admin_show_port")
+    def _admin_show_port(self, port, **params):
+
+       return self.admin_clients("neutron").show_port(port["port"]["id"], **params)
 
     @atomic.action_timer("neutron.admin_delete_port")
     def _admin_delete_port(self, port):
@@ -289,6 +294,15 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
         self.sleep_between(10, 15)
         return vm
 
+    def admin_boot_server(self, port, image, flavor, name):
+
+        nics = [{"port-id": port}]
+        kwargs = {}
+        kwargs.update({'nics': nics})
+        vm = self._admin_boot_server(image, flavor, name, False, **kwargs)
+        self.sleep_between(10, 15)
+        return vm
+
     def create_rally_client(self, pro_name, username, context):
 
         pro = self._create_project(pro_name, 'default')
@@ -351,6 +365,40 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
         command = {
                     "interpreter": "/bin/sh",
                     "script_inline": "ping "+dest_ip+" -c 5 -i 0.2 -W 1 -s 1000; nc -w 1 -v "+dest_ip+" -z 22"
+                }
+        return command
+
+    def command_for_icmp_traffic(self, dest_ip):
+
+        command = {
+                    "interpreter": "/bin/sh",
+                    "script_inline": "hping3 "+dest_ip+" --icmp -c 5 --fast -q -d 1000"
+                }
+        return command
+
+    def command_for_tcp_traffic(self, dest_ip):
+
+        command = {
+                    "interpreter": "/bin/sh",
+                    "script_inline": "hping3 "+dest_ip+" -S -V -p 80 -c 5 --fast -q --tcp-timestamp;\
+                                      hping3 "+dest_ip+" -S -A -V -p 80 -c 5 --fast -q --tcp-timestamp;\
+                                      hping3 "+dest_ip+" -S -A -F -V -p 80 -c 5 --fast -q --tcp-timestamp"
+                }
+        return command
+
+    def command_for_udp_traffic(self, dest_ip):
+
+        command = {
+                    "interpreter": "/bin/sh",
+                    "script_inline": "hping3 "+dest_ip+" --udp -p 80 -c 5 --fast -q"
+                }
+        return command
+
+    def command_for_vm_config(self):
+
+        command = {
+                    "interpreter": "/bin/sh",
+                    "script_inline": "dhclient eth1"
                 }
         return command
 
