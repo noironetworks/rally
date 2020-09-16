@@ -17,11 +17,11 @@ from rally.plugins.openstack.scenarios.neutron import utils as neutron_utils
 class EastWest(create_resources.CreateResources, osutils.OSScenario, gbputils.GBPScenario,
                neutron_utils.NeutronScenario, nova_utils.NovaScenario, scenario.OpenStackScenario):
 
-    def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, plugin_type):
+    def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, nova_az, plugin_type):
 
         gbp = self.gbp_client(controller_ip, "admin", "noir0123", "admin")
 
-        policy_rule_set = self.create_gbp_policy_rule_set_east_west(gbp)
+        policy_rule_set, policy_rules = self.create_gbp_policy_rule_set_east_west(gbp)
 
         l3p = self.create_gbp_l3policy(gbp, "demo_same_ptg_l2p_l3p",
                                        **{"ip_pool": "5.5.5.0/24", "subnet_prefix_length": "28"})
@@ -43,10 +43,11 @@ class EastWest(create_resources.CreateResources, osutils.OSScenario, gbputils.GB
         nics = [{"port-id": pfip_id}, {"port-id": port1}]
         kwargs = {}
         kwargs.update({'nics': nics})
+        kwargs.update({"availability_zone": nova_az})
         vm1 = self._admin_boot_server(image, flavor, "VM1", False, **kwargs)
 
+        vm2 = self.admin_boot_server(port2, image, flavor, "VM2", **{"availability_zone": nova_az})
         vm3 = self.admin_boot_server(port3, image, flavor, "VM3")
-        vm2 = self.admin_boot_server(port2, image, flavor, "VM2")
 
         vm_list = [vm1, vm2, vm3]
         fip = pfip.get('port', {}).get('fixed_ips')[0].get('ip_address')
@@ -54,7 +55,7 @@ class EastWest(create_resources.CreateResources, osutils.OSScenario, gbputils.GB
         ip3 = self._admin_show_port({"port": {"id": port3}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
 
         print "Configuring multi-interface in VM\n"
-        command0 = self.command_for_vm_config()
+        command0 = self.command_for_vm_config_with_route()
         self._remote_command("root", "noir0123", fip, command0, vm1)
 
         print("Traffic verification for same_host\n")
@@ -200,3 +201,4 @@ class EastWest(create_resources.CreateResources, osutils.OSScenario, gbputils.GB
         self._remote_command("root", "noir0123", fip, command3, vm)
         self._remote_command("root", "noir0123", fip, command4, vm)
         self._remote_command("root", "noir0123", fip, command5, vm)
+

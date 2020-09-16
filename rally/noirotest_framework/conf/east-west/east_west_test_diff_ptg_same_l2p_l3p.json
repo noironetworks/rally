@@ -1,0 +1,25 @@
+{
+    "ScenarioPlugin.east_west_test_diff_ptg_same_l2p_l3p": [
+        {
+            "args": {
+                "controller_ip": "10.30.120.115",
+                "image": "a2365cc3-0e79-45c3-92fa-166a0925b782",
+                "flavor": "788be9bf-ae3e-4ed6-b5f8-04000c83f2c4",
+                "L3OUT1": "sauto_l3out-1",
+                "L3OUT1_NET": "sauto_l3out-1_epg",
+                "nova_az": "gbp_zone"
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ]
+}

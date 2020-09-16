@@ -294,10 +294,9 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
         self.sleep_between(10, 15)
         return vm
 
-    def admin_boot_server(self, port, image, flavor, name):
+    def admin_boot_server(self, port, image, flavor, name, **kwargs):
 
         nics = [{"port-id": port}]
-        kwargs = {}
         kwargs.update({'nics': nics})
         vm = self._admin_boot_server(image, flavor, name, False, **kwargs)
         self.sleep_between(10, 15)
@@ -394,11 +393,11 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
                 }
         return command
 
-    def command_for_vm_config(self):
+    def command_for_vm_config_with_route(self):
 
         command = {
                     "interpreter": "/bin/sh",
-                    "script_inline": "dhclient eth1"
+                    "script_inline": "ip route add 1.108.1.0/24 via 50.50.50.1 dev eth0;ip route del default;dhclient eth1"
                 }
         return command
 

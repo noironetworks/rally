@@ -17,7 +17,7 @@ from rally.plugins.openstack.scenarios.nova import utils as nova_utils
 class EastWest(create_resources.CreateResources, gbputils.GBPScenario, osutils.OSScenario, neutron_utils.NeutronScenario,
                nova_utils.NovaScenario, scenario.OpenStackScenario):
 
-    def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET):
+    def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, nova_az):
 
         gbp = self.gbp_client(controller_ip, "admin", "noir0123", "admin")
 
@@ -44,10 +44,11 @@ class EastWest(create_resources.CreateResources, gbputils.GBPScenario, osutils.O
         nics = [{"port-id": pfip_id}, {"port-id": port1}]
         kwargs = {}
         kwargs.update({'nics': nics})
+        kwargs.update({"availability_zone": nova_az})
         vm4 = self._admin_boot_server(image, flavor, "VM4", False, **kwargs)
 
+        vm5 = self.admin_boot_server(port2, image, flavor, "VM5", **{"availability_zone": nova_az})
         vm6 = self.admin_boot_server(port3, image, flavor, "VM6")
-        vm5 = self.admin_boot_server(port2, image, flavor, "VM5")
 
         ptgs = [ptg1, ptg2]
         vm_list = [vm4, vm5, vm6]
@@ -57,7 +58,7 @@ class EastWest(create_resources.CreateResources, gbputils.GBPScenario, osutils.O
         ip6 = self._admin_show_port({"port": {"id": port3}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
 
         print "Configuring multi-interface in VM\n"
-        command0 = self.command_for_vm_config()
+        command0 = self.command_for_vm_config_with_route()
         self._remote_command("root", "noir0123", fip, command0, vm4)
 
         print("Traffic verification for same_host\n")
