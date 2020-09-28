@@ -339,7 +339,7 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
 
         command = {
                     "interpreter": "/bin/sh",
-                    "script_inline": """nohup python -m SimpleHTTPServer 80 & " ";echo 'Starting SimpleHTTPServer on port 80'"""
+                    "script_inline": """nohup python -m SimpleHTTPServer 90 & " ";echo 'Starting SimpleHTTPServer on port 90'"""
                 }
         return command
 
@@ -347,7 +347,7 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
 
         command = {
                     "interpreter": "/bin/sh",
-                    "script_inline": """kill -9 $(ps -ef | grep [S]imple | awk -F" " '{print $2}');echo 'Stopping SimpleHTTPServer on port 80'"""
+                    "script_inline": """kill -9 $(ps | grep [S]imple | awk -F" " '{print $1}');echo 'Stopping SimpleHTTPServer on port 90'"""
                 }
         return command
 
@@ -393,11 +393,11 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
                 }
         return command
 
-    def command_for_vm_config_with_route(self):
+    def command_for_vm_config_with_route(self, extrtr_net1):
 
         command = {
                     "interpreter": "/bin/sh",
-                    "script_inline": "ip route add 1.108.1.0/24 via 50.50.50.1 dev eth0;ip route del default;dhclient eth1"
+                    "script_inline": "ip route add "+extrtr_net1+" via 50.50.50.1 dev eth0;ip route del default;udhcpc -i eth1"
                 }
         return command
 
@@ -501,6 +501,127 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
             self.add_output(complete={"title": "Script Output",
                                       "chart_plugin": "TextArea",
                                       "data": text_area_output})
+
+    @atomic.action_timer("vm.attach_floating_ip")
+    def admin_attach_floating_ip(self, server, floating_network):
+        internal_network = list(server.networks)[0]
+        fixed_ip = server.addresses[internal_network][0]["addr"]
+
+        with atomic.ActionTimer(self, "neutron.create_floating_ip"):
+            fip = network_wrapper.wrap(self.admin_clients, self).create_floating_ip(
+                ext_network=floating_network,
+                tenant_id=server.tenant_id, fixed_ip=fixed_ip)
+
+        self.admin_associate_floating_ip(server, fip, fixed_address=fixed_ip)
+
+        return fip
+
+    @atomic.action_timer("nova.associate_floating_ip")
+    def admin_associate_floating_ip(self, server, address, fixed_address=None):
+        """Add floating IP to an instance
+        :param server: The :class:`Server` to add an IP to.
+        :param address: The dict-like representation of FloatingIP to add
+            to the instance
+        :param fixed_address: The fixedIP address the FloatingIP is to be
+               associated with (optional)
+        """
+        with atomic.ActionTimer(self, "neutron.list_ports"):
+            ports = self.admin_clients("neutron").list_ports(device_id=server.id)
+            port = ports["ports"][0]
+
+        fip = address
+        if not isinstance(address, dict):
+            LOG.warning(
+                "The argument 'address' of "
+                "NovaScenario._associate_floating_ip method accepts a "
+                "dict-like representation of floating ip. Transmitting a "
+                "string with just an IP is deprecated.")
+            with atomic.ActionTimer(self, "neutron.list_floating_ips"):
+                all_fips = self.admin_clients("neutron").list_floatingips(
+                    tenant_id=self.context["tenant"]["id"])
+            filtered_fip = [f for f in all_fips["floatingips"]
+                            if f["floating_ip_address"] == address]
+            if not filtered_fip:
+                raise exceptions.NotFoundException(
+                    "There is no floating ip with '%s' address." % address)
+            fip = filtered_fip[0]
+        # the first case: fip object is returned from network wrapper
+        # the second case: from neutronclient directly
+        fip_ip = fip.get("ip", fip.get("floating_ip_address", None))
+        fip_update_dict = {"port_id": port["id"]}
+        if fixed_address:
+            fip_update_dict["fixed_ip_address"] = fixed_address
+        self.admin_clients("neutron").update_floatingip(
+            fip["id"], {"floatingip": fip_update_dict}
+        )
+        utils.wait_for(server,
+                       is_ready=self.check_ip_address(fip_ip),
+                       update_resource=utils.get_from_manager())
+        # Update server data
+        server.addresses = server.manager.get(server.id).addresses
+
+    @atomic.action_timer("nova.dissociate_floating_ip")
+    def admin_dissociate_floating_ip(self, server, address):
+        """Remove floating IP from an instance
+        :param server: The :class:`Server` to add an IP to.
+        :param address: The dict-like representation of FloatingIP to remove
+        """
+        fip = address
+        if not isinstance(fip, dict):
+            LOG.warning(
+                "The argument 'address' of "
+                "NovaScenario._dissociate_floating_ip method accepts a "
+                "dict-like representation of floating ip. Transmitting a "
+                "string with just an IP is deprecated.")
+            with atomic.ActionTimer(self, "neutron.list_floating_ips"):
+                all_fips = self.admin_clients("neutron").list_floatingips(
+                    tenant_id=self.context["tenant"]["id"]
+                )
+            filtered_fip = [f for f in all_fips["floatingips"]
+                            if f["floating_ip_address"] == address]
+            if not filtered_fip:
+                raise exceptions.NotFoundException(
+                    "There is no floating ip with '%s' address." % address)
+            fip = filtered_fip[0]
+        self.admin_clients("neutron").update_floatingip(
+            fip["id"], {"floatingip": {"port_id": None}}
+        )
+        # the first case: fip object is returned from network wrapper
+        # the second case: from neutronclient directly
+        fip_ip = fip.get("ip", fip.get("floating_ip_address", None))
+        utils.wait_for(
+            server,
+            is_ready=self.check_ip_address(fip_ip, must_exist=False),
+            update_resource=utils.get_from_manager()
+        )
+        # Update server data
+        server.addresses = server.manager.get(server.id).addresses
+
+    @atomic.action_timer("vm.delete_floating_ip")
+    def admin_delete_floating_ip(self, server, fip):
+        with logging.ExceptionLogger(
+                LOG, "Unable to delete IP: %s" % fip["ip"]):
+            if self.check_ip_address(fip["ip"])(server):
+                self.admin_dissociate_floating_ip(server, fip)
+                with atomic.ActionTimer(self, "neutron.delete_floating_ip"):
+                    network_wrapper.wrap(self.admin_clients,
+                                         self).delete_floating_ip(
+                        fip["id"], wait=True)
+
+    def add_route_in_extrtr(self, extrtr_ip, route, nexthop, action="add"):
+
+        print "adding routes in external-router-vm\n"
+        if action == "add":
+            command = {
+                    "interpreter": "/bin/sh",
+                    "script_inline": "sudo ip route add "+route+" via "+nexthop+";ip route"
+                }
+        if action == "update":
+            command = {
+                    "interpreter": "/bin/sh",
+                    "script_inline": "sudo ip route del "+route+";sudo ip route add "+route+" via "+nexthop+";ip route"
+                }
+        self._remote_command_wo_server("noiro", "noir0123", extrtr_ip, command)
 
 class TestError(Exception):
     pass

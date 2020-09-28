@@ -17,7 +17,7 @@ from rally.plugins.openstack.scenarios.nova import utils as nova_utils
 class EastWest(create_resources.CreateResources, gbputils.GBPScenario, osutils.OSScenario, neutron_utils.NeutronScenario,
                nova_utils.NovaScenario, scenario.OpenStackScenario):
 
-    def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, nova_az):
+    def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, extrtr_net1, nova_az):
 
         gbp = self.gbp_client(controller_ip, "admin", "noir0123", "admin")
 
@@ -58,7 +58,7 @@ class EastWest(create_resources.CreateResources, gbputils.GBPScenario, osutils.O
         ip6 = self._admin_show_port({"port": {"id": port3}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
 
         print "Configuring multi-interface in VM\n"
-        command0 = self.command_for_vm_config_with_route()
+        command0 = self.command_for_vm_config_with_route(extrtr_net1)
         self._remote_command("root", "noir0123", fip, command0, vm4)
 
         print("Traffic verification for same_host\n")

@@ -31,13 +31,13 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_policy_action")
     def create_gbp_policy_action(self, gbp_client, name, **kwargs):
         """
-		Create a GBP Policy Action
-		Supported  keyword based attributes and their values:
-		'action_type'= 'allow','redirect'
-		'action_value'= uuid string
-		'shared'= 'True', 'False'
-		'description'= any string
-		"""
+                Create a GBP Policy Action
+                Supported  keyword based attributes and their values:
+                'action_type'= 'allow','redirect'
+                'action_value'= uuid string
+                'shared'= 'True', 'False'
+                'description'= any string
+                """
         policy_action = {"name": name}
         try:
             for arg, val in kwargs.items():
@@ -52,8 +52,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_policy_action")
     def verify_gbp_policy_action(self, gbp_client, name):
         """
-		Verify the GBP Policy Action by passing its name
-		"""
+                Verify the GBP Policy Action by passing its name
+                """
         for action in gbp_client.list_policy_actions()['policy_actions']:
             if action['name'].encode('ascii') == name:
                 return action['id'].encode('ascii')
@@ -64,13 +64,13 @@ class GBPScenario(scenario.OpenStackScenario):
     def update_gbp_policy_action(self, gbp_client, name_uuid,
                                  property_type='name', **kwargs):
         """
-		 Update a GBP Policy Action
-		 Supported  keyword based attributes and their values:
-		 'action_type'= 'allow','redirect'
-		 'action_value'= uuid string
-		 'shared'= 'True', 'False'
-		 'description'= any string
-		 """
+                 Update a GBP Policy Action
+                 Supported  keyword based attributes and their values:
+                 'action_type'= 'allow','redirect'
+                 'action_value'= uuid string
+                 'shared'= 'True', 'False'
+                 'description'= any string
+                 """
         if property_type == 'uuid':
             action_id = name_uuid
         else:
@@ -89,9 +89,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_policy_action")
     def get_gbp_policy_action_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP Policy Actions
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP Policy Actions
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -111,8 +111,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.show_policy_action")
     def get_gbp_policy_action_show(self, gbp_client, uuid):
         """
-		Fetch the details of a given GBP Policy Action
-		"""
+                Fetch the details of a given GBP Policy Action
+                """
         try:
             pa = gbp_client.show_policy_action(uuid)
         except Exception as e:
@@ -124,11 +124,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_policy_action")
     def delete_gbp_policy_action(self, gbp_client, name_uuid, property_type='name'):
         """
-		 Delete a GBP Policy Action
-		 property_type='name' or 'uuid'
-		 If property_type=='name', pass 'name_string' for name_uuid,
-		 else pass 'uuid_string' for name_uuid param
-		 """
+                 Delete a GBP Policy Action
+                 property_type='name' or 'uuid'
+                 If property_type=='name', pass 'name_string' for name_uuid,
+                 else pass 'uuid_string' for name_uuid param
+                 """
         try:
             if property_type == 'name':
                 action_uuid = self.verify_gbp_policy_action(gbp_client, name_uuid)
@@ -143,14 +143,14 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_policy_classifier")
     def create_gbp_policy_classifier(self, gbp_client, name, **kwargs):
         """
-		Create GBP Policy Classifier
-		Supported  keyword based attributes and their values:
-		'direction'= 'in','bi','out'
-		'protocol'= 'tcp','udp','icmp'
-		'port_range'= 'x:y', where x<=y, 66:67 or 66:66
-		'shared'= 'True', 'False'
-		'description'= any string
-		"""
+                Create GBP Policy Classifier
+                Supported  keyword based attributes and their values:
+                'direction'= 'in','bi','out'
+                'protocol'= 'tcp','udp','icmp'
+                'port_range'= 'x:y', where x<=y, 66:67 or 66:66
+                'shared'= 'True', 'False'
+                'description'= any string
+                """
         policy_classifier = {"name": name}
         try:
             for arg, val in kwargs.items():
@@ -166,14 +166,14 @@ class GBPScenario(scenario.OpenStackScenario):
     def update_gbp_policy_classifier(self, gbp_client, name_uuid,
                                      property_type='name', **kwargs):
         """
-		 Update GBP Policy Classifier editable attributes
-		 Supported  keyword based attributes and their values:
-		 'direction'= 'in','bi','out'
-		 'protocol'= 'tcp','udp','icmp'
-		 'port_range'= 'x:y', where x<=y, 66:67 or 66:66
-		 'shared'= 'True', 'False'
-		 'description'= any string
-		 """
+                 Update GBP Policy Classifier editable attributes
+                 Supported  keyword based attributes and their values:
+                 'direction'= 'in','bi','out'
+                 'protocol'= 'tcp','udp','icmp'
+                 'port_range'= 'x:y', where x<=y, 66:67 or 66:66
+                 'shared'= 'True', 'False'
+                 'description'= any string
+                 """
         if property_type == 'uuid':
             classifier_id = name_uuid
         else:
@@ -192,9 +192,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_policy_classifier")
     def get_gbp_policy_classifier_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP Policy Classifiers
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP Policy Classifiers
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -214,11 +214,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_policy_classifier")
     def delete_gbp_policy_classifier(self, gbp_client, name_uuid, property_type='name'):
         """
-		 Delete a GBP Policy Classifier
-		 property_type='name' or 'uuid'
-		 If property_type=='name', pass 'name_string' for name_uuid,
-		 else pass 'uuid_string' for name_uuid param
-		 """
+                 Delete a GBP Policy Classifier
+                 property_type='name' or 'uuid'
+                 If property_type=='name', pass 'name_string' for name_uuid,
+                 else pass 'uuid_string' for name_uuid param
+                 """
         try:
             if property_type == 'name':
                 class_uuid = self.verify_gbp_policy_classifier(gbp_client, name_uuid)
@@ -233,8 +233,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_policy_classifier")
     def verify_gbp_policy_classifier(self, gbp_client, name):
         """
-		Verify the GBP Policy Classifier by passing its name and fetch its UUID
-		"""
+                Verify the GBP Policy Classifier by passing its name and fetch its UUID
+                """
         for classifier in gbp_client.list_policy_classifiers()['policy_classifiers']:
             if classifier['name'].encode('ascii') == name:
                 return classifier['id'].encode('ascii')
@@ -245,14 +245,14 @@ class GBPScenario(scenario.OpenStackScenario):
     def create_gbp_policy_rule(self, gbp_client, name, classifier, action,
                                property_type='name', **kwargs):
         """
-		Create a GBP Policy Rule
-		classifier/action: Pass name-string or uuid-string
-		depending on property_type
-		property_type: 'uuid' or 'name'(default)
-		Supported  keyword based attributes and their values:
-		'shared'= 'True', 'False'
-		'description'= any string
-		"""
+                Create a GBP Policy Rule
+                classifier/action: Pass name-string or uuid-string
+                depending on property_type
+                property_type: 'uuid' or 'name'(default)
+                Supported  keyword based attributes and their values:
+                'shared'= 'True', 'False'
+                'description'= any string
+                """
         if property_type == 'name':
             classifier_id = self.verify_gbp_policy_classifier(gbp_client, classifier)
             action_id = self.verify_gbp_policy_action(gbp_client, action)
@@ -276,13 +276,13 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.update_policy_rule")
     def update_gbp_policy_rule(self, gbp_client, name_uuid, property_type='name', **kwargs):
         """
-		 Update GBP Policy Rule editable attributes
-		 Supported  keyword based attributes and their values:
-		 'policy_classifer'= uuid of policy_classifier
-		 'policy_actions' = uuid of policy_action
-		 'shared'= 'True', 'False'
-		 'description'= any string
-		 """
+                 Update GBP Policy Rule editable attributes
+                 Supported  keyword based attributes and their values:
+                 'policy_classifer'= uuid of policy_classifier
+                 'policy_actions' = uuid of policy_action
+                 'shared'= 'True', 'False'
+                 'description'= any string
+                 """
         if property_type == 'uuid':
             rule_id = name_uuid
         else:
@@ -301,8 +301,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_policy_rule")
     def verify_gbp_policy_rule(self, gbp_client, name):
         """
-		Verify the GBP Policy Rule by passing its name and fetch its UUID
-		"""
+                Verify the GBP Policy Rule by passing its name and fetch its UUID
+                """
         for rule in gbp_client.list_policy_rules()['policy_rules']:
             if rule['name'].encode('ascii') == name:
                 return rule['id'].encode('ascii')
@@ -312,9 +312,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_policy_rule")
     def get_gbp_policy_rule_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP Policy Rules
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP Policy Rules
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -334,11 +334,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_policy_rule")
     def delete_gbp_policy_rule(self, gbp_client, name_uuid, property_type='name'):
         """
-		 Delete a GBP Policy Rule
-		 property_type='name' or 'uuid'
-		 If property_type=='name', pass 'name_string' for name_uuid,
-		 else pass 'uuid_string' for name_uuid param
-		 """
+                 Delete a GBP Policy Rule
+                 property_type='name' or 'uuid'
+                 If property_type=='name', pass 'name_string' for name_uuid,
+                 else pass 'uuid_string' for name_uuid param
+                 """
         try:
             if property_type == 'name':
                 rule_uuid = self.verify_gbp_policy_rule(gbp_client, name_uuid)
@@ -354,13 +354,13 @@ class GBPScenario(scenario.OpenStackScenario):
     def create_gbp_policy_rule_set(self, gbp_client, name, rule_list=[],
                                    property_type='name', **kwargs):
         """
-		Create a GBP Policy RuleSet
-		rule_list: List of policy_rules,pass list of rule_names or rule_uuid strings
-			   depending on the property_type(defaulted to 'name')
-		Supported  keyword based attributes and their values:
-		'shared' = False,True
-		'description' = any string
-		"""
+                Create a GBP Policy RuleSet
+                rule_list: List of policy_rules,pass list of rule_names or rule_uuid strings
+                           depending on the property_type(defaulted to 'name')
+                Supported  keyword based attributes and their values:
+                'shared' = False,True
+                'description' = any string
+                """
         try:
             if property_type == 'name':
                 temp = rule_list
@@ -381,8 +381,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_policy_rule_set")
     def verify_gbp_policy_rule_set(self, gbp_client, name):
         """
-		Verify the GBP Policy RuleSet by passing its name and fetch its UUID
-		"""
+                Verify the GBP Policy RuleSet by passing its name and fetch its UUID
+                """
         for ruleset in gbp_client.list_policy_rule_sets()['policy_rule_sets']:
             if ruleset['name'].encode('ascii') == name:
                 return ruleset['id'].encode('ascii')
@@ -393,12 +393,12 @@ class GBPScenario(scenario.OpenStackScenario):
     def update_gbp_policy_rule_set(self, gbp_client, name_uuid,
                                    property_type='name', **kwargs):
         """
-		 Update GBP Policy Rule editable attributes
-		 Supported  keyword based attributes and their values/type:
-		 'policy_rules'= [list of policy-rule uuid]
-		 'shared'= 'True', 'False'
-		 'description'= any string
-		 """
+                 Update GBP Policy Rule editable attributes
+                 Supported  keyword based attributes and their values/type:
+                 'policy_rules'= [list of policy-rule uuid]
+                 'shared'= 'True', 'False'
+                 'description'= any string
+                 """
         if property_type == 'uuid':
             ruleset_id = name_uuid
         else:
@@ -417,11 +417,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_policy_rule_set")
     def delete_gbp_policy_rule_set(self, gbp_client, name_uuid, property_type='name'):
         """
-		 Delete a GBP Policy RuleSet
-		 property_type='name' or 'uuid'
-		 If property_type=='name', pass 'name_string' for name_uuid,
-		 else pass 'uuid_string' for name_uuid param
-		 """
+                 Delete a GBP Policy RuleSet
+                 property_type='name' or 'uuid'
+                 If property_type=='name', pass 'name_string' for name_uuid,
+                 else pass 'uuid_string' for name_uuid param
+                 """
         try:
             if property_type == 'name':
                 ruleset_uuid = self.verify_gbp_policy_rule_set(gbp_client, name_uuid)
@@ -436,9 +436,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_policy_rule_set")
     def get_gbp_policy_rule_set_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP Policy RuleSet
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP Policy RuleSet
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -458,16 +458,16 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_policy_target_group")
     def create_gbp_policy_target_group(self, gbp_client, name, **kwargs):
         """
-		Create a GBP Policy Target Group
-		Supported  keyword based attributes and their values/types:
-		'l2_policy_id' = l2policy_uuid
-		'network_service_policy_id' = nsp_uuid
-		'consumed_policy_rule_sets' = [list of policy_rule_set_uuid]
-		'provided_policy_rule_sets' = [list policy_rule_set_uuid]
-		'nextwork_service_policy' = name_uuid_network_service_policy
-		'shared' = False,True
-		'description' = any string
-		"""
+                Create a GBP Policy Target Group
+                Supported  keyword based attributes and their values/types:
+                'l2_policy_id' = l2policy_uuid
+                'network_service_policy_id' = nsp_uuid
+                'consumed_policy_rule_sets' = [list of policy_rule_set_uuid]
+                'provided_policy_rule_sets' = [list policy_rule_set_uuid]
+                'nextwork_service_policy' = name_uuid_network_service_policy
+                'shared' = False,True
+                'description' = any string
+                """
         try:
             policy_target_group = {"name": name}
             for arg, val in kwargs.items():
@@ -484,8 +484,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_policy_target_group")
     def verify_gbp_policy_target_group(self, gbp_client, name):
         """
-		Verify the GBP Policy Target Group by passing its name and fetch its UUID
-		"""
+                Verify the GBP Policy Target Group by passing its name and fetch its UUID
+                """
         for ptg in gbp_client.list_policy_target_groups()['policy_target_groups']:
             if ptg['name'].encode('ascii') == name:
                 return ptg['id'].encode('ascii')
@@ -500,10 +500,10 @@ class GBPScenario(scenario.OpenStackScenario):
                                        shared=False,
                                        network_service_policy='', **kwargs):
         """
-		Update the Policy Target Group
-		Provide uniform property_type('name' or 'uuid') across objects
-		Pass policy_rulesets as []
-		"""
+                Update the Policy Target Group
+                Provide uniform property_type('name' or 'uuid') across objects
+                Pass policy_rulesets as []
+                """
         try:
             consumed_dict = {}
             provided_dict = {}
@@ -530,7 +530,7 @@ class GBPScenario(scenario.OpenStackScenario):
                 policy_target_group = {}
                 for arg, val in kwargs.items():
                     policy_target_group[arg] = val
-                policy_target_group[shared] = shared
+                policy_target_group['shared'] = shared
                 body = {"policy_target_group": policy_target_group}
             if consumed_policy_rulesets != '' and consumed_policy_rulesets is not None:
                 if provided_policy_rulesets != '' and provided_policy_rulesets is not None:
@@ -592,11 +592,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_policy_target_group")
     def delete_gbp_policy_target_group(self, gbp_client, name_uuid, property_type='name'):
         """
-		 Delete a GBP Policy Group
-		 property_type='name' or 'uuid'
-		 If property_type=='name', pass 'name_string' for name_uuid,
-		 else pass 'uuid_string' for name_uuid param
-		 """
+                 Delete a GBP Policy Group
+                 property_type='name' or 'uuid'
+                 If property_type=='name', pass 'name_string' for name_uuid,
+                 else pass 'uuid_string' for name_uuid param
+                 """
         try:
             if property_type == 'name':
                 ptg_uuid = self.verify_gbp_policy_target_group(gbp_client, name_uuid)
@@ -611,9 +611,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_policy_target_group")
     def get_gbp_policy_target_group_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP Policy Target Group
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP Policy Target Group
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -633,10 +633,10 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_policy_target")
     def create_gbp_policy_target(self, gbp_client, name, ptg_name, pt_count=1, ptg_property='name'):
         """
-		Create a Policy Target for a given PTG
-		'pt_count':: number of PTs to be created for a given PTG
-		'ptg_property':: ptg passed can be 'name' or 'uuid'
-		"""
+                Create a Policy Target for a given PTG
+                'pt_count':: number of PTs to be created for a given PTG
+                'ptg_property':: ptg passed can be 'name' or 'uuid'
+                """
         try:
             if ptg_property == 'name':
                 ptg_id = self.verify_gbp_policy_target_group(gbp_client, ptg_name)
@@ -660,9 +660,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_policy_target")
     def verify_gbp_policy_target(self, gbp_client, name):
         """
-		Verify the GBP Policy Target by passing its name
-		Returns PT and its corresponding Neutron Port UUIDs
-		"""
+                Verify the GBP Policy Target by passing its name
+                Returns PT and its corresponding Neutron Port UUIDs
+                """
         for pt in gbp_client.list_policy_targets()['policy_targets']:
             if pt['name'].encode('ascii') == name:
                 return pt['id'].encode('ascii'), pt['port_id'].encode('ascii')
@@ -673,8 +673,8 @@ class GBPScenario(scenario.OpenStackScenario):
     def update_gbp_policy_target(self, gbp_client, name_uuid,
                                  property_type='name', **kwargs):
         """
-		 Update GBP Policy Target
-		 """
+                 Update GBP Policy Target
+                 """
         if property_type == 'uuid':
             pt_id = name_uuid
         else:
@@ -693,10 +693,10 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_policy_target")
     def get_gbp_policy_target_list(self, gbp_client):
         """
-		Fetches a list of Policy Targets
-		Returns a dict of Policy Targets UUIDs
-		and their corresponding Neutron Port UUIDs
-		"""
+                Fetches a list of Policy Targets
+                Returns a dict of Policy Targets UUIDs
+                and their corresponding Neutron Port UUIDs
+                """
         pt_nic_id = {}
         pt_list = gbp_client.list_policy_targets()['policy_targets']
         if len(pt_list):
@@ -712,11 +712,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_policy_target")
     def delete_gbp_policy_target(self, gbp_client, name_uuid, property_type='name'):
         """
-		 Delete a GBP Policy Target
-		 property_type='name' or 'uuid'
-		 If property_type=='name', pass 'name_string' for name_uuid,
-		 else pass 'uuid_string' for name_uuid param
-		 """
+                 Delete a GBP Policy Target
+                 property_type='name' or 'uuid'
+                 If property_type=='name', pass 'name_string' for name_uuid,
+                 else pass 'uuid_string' for name_uuid param
+                 """
         try:
             if property_type == 'name':
                 pt_uuid = self.verify_gbp_policy_target(gbp_client, name_uuid)
@@ -731,14 +731,14 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_l3_policy")
     def create_gbp_l3policy(self, gbp_client, name, **kwargs):
         """
-		Create a GBP L3Policy
-		Supported  keyword based attributes and their values/type:
-		'ip_pool' = string (eg:'1.2.3.0/24')
-		'subnet_prefix_length' = integer
-		'external_segments': {}
-		'shared': True, False
-		'description': string
-		"""
+                Create a GBP L3Policy
+                Supported  keyword based attributes and their values/type:
+                'ip_pool' = string (eg:'1.2.3.0/24')
+                'subnet_prefix_length' = integer
+                'external_segments': {}
+                'shared': True, False
+                'description': string
+                """
         try:
             l3policy = {"name": name}
             for arg, val in kwargs.items():
@@ -756,8 +756,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_l3_policy")
     def verify_gbp_l3policy(self, gbp_client, name):
         """
-		Verify the GBP L3Policy by passing its name and fetch its UUID
-		"""
+                Verify the GBP L3Policy by passing its name and fetch its UUID
+                """
         for l3p in gbp_client.list_l3_policies()['l3_policies']:
             if l3p['name'].encode('ascii') == name:
                 return l3p['id'].encode('ascii')
@@ -767,11 +767,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_l3_policy")
     def delete_gbp_l3policy(self, gbp_client, name_uuid, property_type='name'):
         """
-		 Delete a GBP L3Policy
-		 property_type='name' or 'uuid'
-		 If property_type=='name', pass 'name_string' for name_uuid,
-		 else pass 'uuid_string' for name_uuid param
-		 """
+                 Delete a GBP L3Policy
+                 property_type='name' or 'uuid'
+                 If property_type=='name', pass 'name_string' for name_uuid,
+                 else pass 'uuid_string' for name_uuid param
+                 """
         try:
             if property_type == 'name':
                 l3p_uuid = self.verify_gbp_l3policy(gbp_client, name_uuid)
@@ -786,13 +786,13 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.update_l3_policy")
     def update_gbp_l3policy(self, gbp_client, name_uuid, property_type='name', **kwargs):
         """
-		 Update GBP L3Policy editable attributes
-		 Supported keyword based attributes and their values/type:
-		 'subnet_prefix_length' = integer'
-		 'shared'= 'True', 'False'
-		 'description'= any string
-		 'external_segments'= UUID of the external segment
-		 """
+                 Update GBP L3Policy editable attributes
+                 Supported keyword based attributes and their values/type:
+                 'subnet_prefix_length' = integer'
+                 'shared'= 'True', 'False'
+                 'description'= any string
+                 'external_segments'= UUID of the external segment
+                 """
         if property_type == 'uuid':
             l3p_id = name_uuid
         else:
@@ -813,9 +813,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_l3_policy")
     def get_gbp_l3policy_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP L3Policy
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP L3Policy
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -835,13 +835,13 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_l2_policy")
     def create_gbp_l2policy(self, gbp_client, name, getl3p=False, autoptg=False, **kwargs):
         """
-		Create a GBP L2Policy
-		Supported  keyword based attributes and their values/type:
-		'l3_policy_id' = string (uuid/name)
-		'subnet_prefix_length' = integer
-		'shared': True, False
-		'description': string
-		"""
+                Create a GBP L2Policy
+                Supported  keyword based attributes and their values/type:
+                'l3_policy_id' = string (uuid/name)
+                'subnet_prefix_length' = integer
+                'shared': True, False
+                'description': string
+                """
         try:
             l2policy = {"name": name}
             for arg, val in kwargs.items():
@@ -871,8 +871,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_l2_policy")
     def verify_gbp_l2policy(self, gbp_client, name):
         """
-		Verify the GBP L2Policy by passing its name and fetch its UUID
-		"""
+                Verify the GBP L2Policy by passing its name and fetch its UUID
+                """
         try:
             for l2p in gbp_client.list_l2_policies()['l2_policies']:
                 if l2p['name'].encode('ascii') == name:
@@ -887,13 +887,13 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.update_l2_policy")
     def update_gbp_l2policy(self, gbp_client, name_uuid, property_type='name', **kwargs):
         """
-		 Update GBP L2Policy editable attributes
-		 Supported keyword based attributes and their values/type:
-		 'l3_policy_id' = string (uuid/name)
-		 'subnet_prefix_length' = integer'
-		 'shared'= 'True', 'False'
-		 'description'= any string
-		 """
+                 Update GBP L2Policy editable attributes
+                 Supported keyword based attributes and their values/type:
+                 'l3_policy_id' = string (uuid/name)
+                 'subnet_prefix_length' = integer'
+                 'shared'= 'True', 'False'
+                 'description'= any string
+                 """
         if property_type == 'uuid':
             l2p_id = name_uuid
         else:
@@ -912,11 +912,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_l2_policy")
     def delete_gbp_l2policy(self, gbp_client, name_uuid, property_type='name'):
         """
-		 Delete a GBP L2Policy
-		 property_type='name' or 'uuid'
-		 If property_type=='name', pass 'name_string' for name_uuid,
-		 else pass 'uuid_string' for name_uuid param
-		 """
+                 Delete a GBP L2Policy
+                 property_type='name' or 'uuid'
+                 If property_type=='name', pass 'name_string' for name_uuid,
+                 else pass 'uuid_string' for name_uuid param
+                 """
         try:
             if property_type == 'name':
                 l2p_uuid = self.verify_gbp_l2policy(gbp_client, name_uuid)
@@ -931,9 +931,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_l2_policy")
     def get_gbp_l2policy_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP L2Policy
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP L2Policy
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -953,16 +953,16 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_external_segment")
     def create_gbp_external_segment(self, gbp_client, name, **kwargs):
         """
-		Create an External Segment
-		Return Ext_Seg_uuid
-		Supported  keyword based attributes and their values/type:
-		'cidr' = string
-		'external_policies'= [](list of external-policies)
-		'external_routes' = [{'destination'=<>,'nexthop'=<>}](Pass list of dictionaries for each dest/nexthop pair)
-		'nexthop' = string('address should be part of the cidr')
-		'shared': True, False
-		'description': string
-		"""
+                Create an External Segment
+                Return Ext_Seg_uuid
+                Supported  keyword based attributes and their values/type:
+                'cidr' = string
+                'external_policies'= [](list of external-policies)
+                'external_routes' = [{'destination'=<>,'nexthop'=<>}](Pass list of dictionaries for each dest/nexthop pair)
+                'nexthop' = string('address should be part of the cidr')
+                'shared': True, False
+                'description': string
+                """
         try:
             external_segment = {"name": name}
             for arg, val in kwargs.items():
@@ -981,8 +981,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_external_segment")
     def delete_gbp_external_segment(self, gbp_client, uuid):
         """
-		 Delete a GBP External Segment
-		 """
+                 Delete a GBP External Segment
+                 """
         try:
             gbp_client.delete_external_segment(uuid)
         except Exception as e:
@@ -993,15 +993,15 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.update_external_segment")
     def update_gbp_external_segment(self, gbp_client, uuid, **kwargs):
         """
-		Update an External Segment
-		Supported  keyword based attributes and their values/type:
-		'cidr' = string
-		'external_policies'= [](list of external-policies)
-		'external_routes' = [{'destination':<>,'nexthop':<>}](Pass list of dictionaries for each dest/nexthop pair)
-		'nexthop' = string('address should be part of the cidr')
-		'shared': True, False
-		'description': string
-		"""
+                Update an External Segment
+                Supported  keyword based attributes and their values/type:
+                'cidr' = string
+                'external_policies'= [](list of external-policies)
+                'external_routes' = [{'destination':<>,'nexthop':<>}](Pass list of dictionaries for each dest/nexthop pair)
+                'nexthop' = string('address should be part of the cidr')
+                'shared': True, False
+                'description': string
+                """
         external_segment = {}
         try:
             for arg, val in kwargs.items():
@@ -1016,9 +1016,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_external_segment")
     def get_gbp_external_segment_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP External Segments
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP External Segments
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -1042,11 +1042,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_nat_pool")
     def create_gbp_nat_pool(self, gbp_client, name, **kwargs):
         """
-		Create a NAT Pool
-		Supported keywords based attributes and their values/type:
-		'ip_pool' = string(must be exact or subnet of cidr)
-		'external_segment_id' = string(name/uuid)
-		"""
+                Create a NAT Pool
+                Supported keywords based attributes and their values/type:
+                'ip_pool' = string(must be exact or subnet of cidr)
+                'external_segment_id' = string(name/uuid)
+                """
         nat_pool = {'name': name}
         try:
             for arg, val in kwargs.items():
@@ -1061,8 +1061,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_nat_pool")
     def delete_gbp_nat_pool(self, gbp_client, uuid):
         """
-		 Delete a GBP NAT Pool
-		 """
+                 Delete a GBP NAT Pool
+                 """
         try:
             gbp_client.delete_nat_pool(uuid)
         except Exception as e:
@@ -1073,9 +1073,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_nat_pool")
     def get_gbp_nat_pool_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP NAT Pools
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP NAT Pools
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -1095,11 +1095,11 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.update_nat_pool")
     def update_gbp_nat_pool(self, gbp_client, uuid, **kwargs):
         """
-		Update a NAT Pool
-		Supported keywords based attributes and their values/type:
-		'ip_pool' = string(must be exact or subnet of cidr)
-		'external_segment_id' = string(name/uuid)
-		"""
+                Update a NAT Pool
+                Supported keywords based attributes and their values/type:
+                'ip_pool' = string(must be exact or subnet of cidr)
+                'external_segment_id' = string(name/uuid)
+                """
         nat_pool = {}
         try:
             for arg, val in kwargs.items():
@@ -1114,8 +1114,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_network_service_policy")
     def create_gbp_network_service_policy(self, gbp_client, name, shared=False):
         """
-		Create Network Service Policy
-		"""
+                Create Network Service Policy
+                """
         network_service_params = [{"type": "ip_pool",
                                    "name": "nat",
                                    "value": "nat_pool"}]
@@ -1133,8 +1133,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.update_network_service_policy")
     def update_gbp_network_service_policy(self, gbp_client, uuid):
         """
-		Update a Network Service Policy
-		"""
+                Update a Network Service Policy
+                """
         nsp_nat = {}
         try:
             body = {'network_service_policy': nsp_nat}
@@ -1147,8 +1147,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_network_service_policy")
     def delete_gbp_network_service_policy(self, gbp_client, nspuuid=''):
         """
-		Delete Network Service Policy
-		"""
+                Delete Network Service Policy
+                """
         try:
             if nspuuid != '':
                 gbp_client.delete_network_service_policy(nspuuid)
@@ -1165,9 +1165,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_network_service_policy")
     def get_gbp_network_service_policy_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP Network Service Policy
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP Network Service Policy
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -1188,10 +1188,10 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.create_external_policy")
     def create_gbp_external_policy(self, gbp_client, name, **kwargs):
         """
-		Create the External Policy
-		Provide uniform property_type('name' or 'uuid') across objects
-		Pass external_segments as a List
-		"""
+                Create the External Policy
+                Provide uniform property_type('name' or 'uuid') across objects
+                Pass external_segments as a List
+                """
 
         try:
             external_policy = {"name": name}
@@ -1214,11 +1214,11 @@ class GBPScenario(scenario.OpenStackScenario):
                                    external_segments=[],
                                    shared=False):
         """
-		Update the External Policy
-		Provide uniform property_type('name' or 'uuid')
-		across objects EXCEPT external_segments(only id)
-		Pass external_segments as a List
-		"""
+                Update the External Policy
+                Provide uniform property_type('name' or 'uuid')
+                across objects EXCEPT external_segments(only id)
+                Pass external_segments as a List
+                """
         try:
             consumed_prs = {}
             provided_prs = {}
@@ -1277,8 +1277,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.delete_external_policy")
     def delete_gbp_external_policy(self, gbp_client, uuid):
         """
-		 Delete a GBP External Policy
-		 """
+                 Delete a GBP External Policy
+                 """
         try:
             gbp_client.delete_external_policy(uuid)
         except Exception as e:
@@ -1289,9 +1289,9 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.list_external_policy")
     def get_gbp_external_policy_list(self, gbp_client, getdict=False):
         """
-		Fetch a List of GBP External Policies
-		getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
-		"""
+                Fetch a List of GBP External Policies
+                getdict: 'True', will return a dictionary comprising 'name' & 'uuid'
+                """
         try:
             if getdict:
                 name_uuid = {}
@@ -1311,8 +1311,8 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_external_policy")
     def verify_gbp_external_policy(self, gbp_client, name):
         """
-		Verify the GBP External Policy by passing its name and fetch its UUID
-		"""
+                Verify the GBP External Policy by passing its name and fetch its UUID
+                """
         for extpol in gbp_client.list_external_policies()['external_policies']:
             if extpol['name'].encode('ascii') == name:
                 return extpol['id'].encode('ascii')
@@ -1322,15 +1322,15 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.verify_any_object")
     def verify_gbp_any_object(self, gbp_client, obj, obj_uuid, **kwargs):
         """
-		Verify any objects and its attributes
-		Pass the keywords as it appears in a show cmd
-		Valid objects are:: l3_policy,l2_policy,policy_target_group,
-		policy_target,nat_pool,external_segment,external_policy and
-		others as it appears in a gbp show CLI
-		keywords:: the string should be exact as seen in gbp show CLI
-		values:: should be passed as the datatype as it appears in CLI
-		Example: For obj: l3_policy, key=l2_policies, val=['uuid of l2p']
-		"""
+                Verify any objects and its attributes
+                Pass the keywords as it appears in a show cmd
+                Valid objects are:: l3_policy,l2_policy,policy_target_group,
+                policy_target,nat_pool,external_segment,external_policy and
+                others as it appears in a gbp show CLI
+                keywords:: the string should be exact as seen in gbp show CLI
+                values:: should be passed as the datatype as it appears in CLI
+                Example: For obj: l3_policy, key=l2_policies, val=['uuid of l2p']
+                """
         if obj == 'l3_policy':
             attributes = gbp_client.show_l3_policy(obj_uuid)[obj]
             for arg, val in kwargs.items():
@@ -1411,10 +1411,10 @@ class GBPScenario(scenario.OpenStackScenario):
     @atomic.action_timer("gbp.add_route_in_shadow_l3out")
     def addrouteinshadowl3out(self, gbp_client, extseg_id, extseg_name, nattype, destrte, route=''):
         """
-		Utility Method to add ext_routes to Ext_Seg
-		ONLY needed for NAT DP TESTs ONLY USED For secondary L3 Out ExtSeg
-		TBD: To be enhanced
-		"""
+                Utility Method to add ext_routes to Ext_Seg
+                ONLY needed for NAT DP TESTs ONLY USED For secondary L3 Out ExtSeg
+                TBD: To be enhanced
+                """
         if extseg_name == "L3OUT2":
             route_gw = ''
         if nattype == 'dnat' and route != '':
