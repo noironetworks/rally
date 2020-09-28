@@ -1,7 +1,8 @@
 {
-    "ScenarioPlugin.ml2_sanity": [
+    "ScenarioPlugin.north_south_test10": [
         {
             "args": {
+                "controller_ip": {{controller_ip}},
                 "L3OUT1": {{L3OUT1}},
                 "L3OUT1_NET": {{L3OUT1_NET}},
                 "L3OUT1_VRF": {{L3OUT1_VRF}},
@@ -13,7 +14,9 @@
                 "ext_rtr" : {{ext_rtr}},
                 "extrtr_ip1" : {{extrtr_ip1}},
                 "extrtr_ip2": {{extrtr_ip2}},
-                "dual_stack": {{dual_stack}}
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
             },
             "runner": {
                 "type": "serial",

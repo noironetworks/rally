@@ -2,19 +2,19 @@
     "ScenarioPlugin.gbp_sanity": [
         {
             "args": {
-                "controller_ip": "10.30.120.115",
-                "L3OUT1": "sauto_l3out-1",
-                "L3OUT1_NET": "sauto_l3out-1_epg",
-                "L3OUT1_VRF": "sauto_l3out-1_vrf",
-                "L3OUT2" : "sauto_l3out-2",
-                "L3OUT2_NET": "sauto_l3out-2_epg",
-                "L3OUT2_VRF": "sauto_l3out-2_vrf",
-                "flavor": "788be9bf-ae3e-4ed6-b5f8-04000c83f2c4",
-                "image": "a2365cc3-0e79-45c3-92fa-166a0925b782",
-                "ext_rtr" : "10.30.120.119",
-                "extrtr_ip1" : "1.108.1.1",
-                "extrtr_ip2": "1.108.2.1",
-                "dual_stack": False
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1": {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "dual_stack": {{dual_stack}}
             },
             "runner": {
                 "type": "serial",
