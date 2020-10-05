@@ -110,7 +110,7 @@ class CreateResources(gbputils.GBPScenario, scenario.OpenStackScenario):
         cls_tcp_id, rule_tcp_id = self.create_gbp_classifier_and_policy_rule(
             gbp, act_id, "ClsTcp", "tcp", "bi", "PrTcp", "20:2000")
         policy_rules.update({"tcp_id": rule_tcp_id})
-        print "Create a ICMP-TCP Policy Rule Set needed for NAT Testing"
+        print "Create a ICMP-TCP Policy Rule Set needed for NAT Testing" 
         prs_icmp_tcp_id = self.create_gbp_policy_ruleset(gbp, "PrsIcmpTcp", rule_ids=[rule_icmp_id, rule_tcp_id])
         policy_ruleset_ids.update({"icmp_tcp_id": prs_icmp_tcp_id})
         print "Create a ICMP Policy Rule Set needed for NAT Testing"
@@ -140,20 +140,24 @@ class CreateResources(gbputils.GBPScenario, scenario.OpenStackScenario):
             print (e)
             raise TestError()
 
-    def cleanup(self, vm_list, gbp):
-
-        for vm in vm_list:
+    def cleanup_ew(self, gbp):
+        
+        print "Cleaning up the setup after testing...\n"
+        for vm in self.admin_clients("nova").servers.list():
             self._delete_server(vm)
-        self.cleanup_gbp(gbp)
+            self.cleanup_gbp(gbp)
+        for net in self.admin_clients("neutron").list_networks()["networks"]:
+            self._delete_all_ports({"network":net})
+            self._admin_delete_network({"network":net})
 
-    def cleanup_ns(self, gbp, vm, fip, ext_net):
-
+    def cleanup_ns(self, gbp):
+        
         print "Global Config Clean-Up Initiated after testing\n"
-        self.admin_delete_floating_ip(vm[0], fip[0])
-        self.admin_delete_floating_ip(vm[1], fip[1])
-        self._delete_server(vm[0])
-        self._delete_server(vm[1])
-        self.cleanup_gbp(gbp)
-        self._admin_delete_network(ext_net[0])
-        self._admin_delete_network(ext_net[1])
+        self.cleanup_floating_ip()
+        for vm in self.admin_clients("nova").servers.list():
+            self._delete_server(vm)
+            self.cleanup_gbp(gbp)
+        for net in self.admin_clients("neutron").list_networks()["networks"]:
+            self._delete_all_ports({"network":net})
+            self._admin_delete_network({"network":net})
 

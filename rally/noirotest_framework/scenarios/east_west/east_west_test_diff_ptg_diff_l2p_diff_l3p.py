@@ -19,99 +19,99 @@ class EastWest(create_resources.CreateResources, gbputils.GBPScenario, osutils.O
 
     def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, extrtr_net1, nova_az):
 
-        gbp = self.gbp_client(controller_ip, "admin", "noir0123", "admin")
+        try:
+            gbp = self.gbp_client(controller_ip, "admin", "noir0123", "admin")
 
-        policy_rule_set, policy_rules = self.create_gbp_policy_rule_set_east_west(gbp)
+            policy_rule_set, policy_rules = self.create_gbp_policy_rule_set_east_west(gbp)
 
-        l3p1 = self.create_gbp_l3policy(gbp, "demo_subnet_1",
-                                        **{"ip_pool": "30.30.30.0/24", "subnet_prefix_length": "28"})
-        l3p2 = self.create_gbp_l3policy(gbp, "demo_subnet_2",
-                                        **{"ip_pool": "40.40.40.0/24", "subnet_prefix_length": "28"})
-        l2p1 = self.create_gbp_l2policy(gbp, "demo_srvr_bd", False, False, **{"l3_policy_id": l3p1})
-        l2p2 = self.create_gbp_l2policy(gbp, "demo_clnt_bd", False, False, **{"l3_policy_id": l3p2})
-        ptg1 = self.create_gbp_policy_target_group(gbp, "demo_diff_ptg_l2p_l3p_ptg1", **{"l2_policy_id": l2p1})
-        ptg2 = self.create_gbp_policy_target_group(gbp, "demo_diff_ptg_l2p_l3p_ptg2", **{"l2_policy_id": l2p2})
+            l3p1 = self.create_gbp_l3policy(gbp, "demo_subnet_1",
+                                            **{"ip_pool": "30.30.30.0/24", "subnet_prefix_length": "28"})
+            l3p2 = self.create_gbp_l3policy(gbp, "demo_subnet_2",
+                                            **{"ip_pool": "40.40.40.0/24", "subnet_prefix_length": "28"})
+            l2p1 = self.create_gbp_l2policy(gbp, "demo_srvr_bd", False, False, **{"l3_policy_id": l3p1})
+            l2p2 = self.create_gbp_l2policy(gbp, "demo_clnt_bd", False, False, **{"l3_policy_id": l3p2})
+            ptg1 = self.create_gbp_policy_target_group(gbp, "demo_diff_ptg_l2p_l3p_ptg1", **{"l2_policy_id": l2p1})
+            ptg2 = self.create_gbp_policy_target_group(gbp, "demo_diff_ptg_l2p_l3p_ptg2", **{"l2_policy_id": l2p2})
 
-        pt1, port1 = self.create_gbp_policy_target(gbp, "vm10_data_pt", "demo_diff_ptg_l2p_l3p_ptg1", 1)
-        pt2, port2 = self.create_gbp_policy_target(gbp, "vm11_data_pt", "demo_diff_ptg_l2p_l3p_ptg2", 1)
-        pt3, port3 = self.create_gbp_policy_target(gbp, "vm12_data_pt", "demo_diff_ptg_l2p_l3p_ptg2", 1)
+            pt1, port1 = self.create_gbp_policy_target(gbp, "vm10_data_pt", "demo_diff_ptg_l2p_l3p_ptg1", 1)
+            pt2, port2 = self.create_gbp_policy_target(gbp, "vm11_data_pt", "demo_diff_ptg_l2p_l3p_ptg2", 1)
+            pt3, port3 = self.create_gbp_policy_target(gbp, "vm12_data_pt", "demo_diff_ptg_l2p_l3p_ptg2", 1)
 
-        print "Create Shared External Network as Management network\n"
-        ext_net1 = self._admin_create_network(L3OUT1, {"shared": True, "router:external": True,
-                                                         "apic:distinguished_names": {"ExternalNetwork": "uni/tn-common/out-"+L3OUT1+"/instP-"+L3OUT1_NET}})
-        ext_sub1 = self._admin_create_subnet(ext_net1, {"cidr": '50.50.50.0/28', "enable_dhcp": True}, None)
-        port_create_args = {}
-        port_create_args.update({"port_security_enabled": "false"})
-        pfip = self._admin_create_port(ext_net1, port_create_args)
-        pfip_id = pfip.get('port', {}).get('id')
-        nics = [{"port-id": pfip_id}, {"port-id": port1}]
-        kwargs = {}
-        kwargs.update({'nics': nics})
-        kwargs.update({"availability_zone": nova_az})
-        vm10 = self._admin_boot_server(image, flavor, "VM10", False, **kwargs)
+            print "Create Shared External Network as Management network\n"
+            ext_net1 = self._admin_create_network(L3OUT1, {"shared": True, "router:external": True,
+                                                             "apic:distinguished_names": {"ExternalNetwork": "uni/tn-common/out-"+L3OUT1+"/instP-"+L3OUT1_NET}})
+            ext_sub1 = self._admin_create_subnet(ext_net1, {"cidr": '50.50.50.0/28', "enable_dhcp": True}, None)
 
-        vm11 = self.admin_boot_server(port2, image, flavor, "VM11", **{"availability_zone": nova_az})
-        vm12 = self.admin_boot_server(port3, image, flavor, "VM12")
+            port_create_args = {}
+            port_create_args.update({"port_security_enabled": "false"})
+            pfip = self._admin_create_port(ext_net1, port_create_args)
+            pfip_id = pfip.get('port', {}).get('id')
+            nics = [{"port-id": pfip_id}, {"port-id": port1}]
+            kwargs = {}
+            kwargs.update({'nics': nics})
+            kwargs.update({"availability_zone": nova_az})
+            vm10 = self._admin_boot_server(image, flavor, "VM10", False, **kwargs)
 
-        ptgs = [ptg1, ptg2]
-        vm_list = [vm10, vm11, vm12]
+            vm11 = self.admin_boot_server(port2, image, flavor, "VM11", **{"availability_zone": nova_az})
+            vm12 = self.admin_boot_server(port3, image, flavor, "VM12")
 
-        fip = pfip.get('port', {}).get('fixed_ips')[0].get('ip_address')
-        ip11 = self._admin_show_port({"port": {"id": port2}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
-        ip12 = self._admin_show_port({"port": {"id": port3}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
+            ptgs = [ptg1, ptg2]
 
-        print "Configuring multi-interface in VM\n"
-        command0 = self.command_for_vm_config_with_route(extrtr_net1)
-        self._remote_command("root", "noir0123", fip, command0, vm10)
+            fip = pfip.get('port', {}).get('fixed_ips')[0].get('ip_address')
+            ip11 = self._admin_show_port({"port": {"id": port2}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
+            ip12 = self._admin_show_port({"port": {"id": port3}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
 
-        print("Traffic verification for same_host\n")
-        self.update_ptg_with_no_prs()
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_no_rule(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_icmp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_tcp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_udp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_icmp_tcp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_icmp_udp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_tcp_udp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_all_proto(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip11)
-        self.update_ptg_with_rem_prs(gbp, ptgs)
-        self.verify_traffic(fip, vm10, ip11)
+            print "Configuring multi-interface in VM\n"
+            command0 = self.command_for_vm_config_with_route(extrtr_net1)
+            self._remote_command("root", "noir0123", fip, command0, vm10)
 
-        print("Traffic verification for diff_host\n")
-        self.update_ptg_with_no_prs()
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_no_rule(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_icmp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_tcp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_udp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_icmp_tcp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_icmp_udp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_tcp_udp(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_all_proto(gbp, ptgs, policy_rule_set)
-        self.verify_traffic(fip, vm10, ip12)
-        self.update_ptg_with_rem_prs(gbp, ptgs)
-        self.verify_traffic(fip, vm10, ip12)
+            print("Traffic verification for same_host\n")
+            self.update_ptg_with_no_prs()
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_no_rule(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_icmp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_tcp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_udp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_icmp_tcp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_icmp_udp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_tcp_udp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_all_proto(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip11)
+            self.update_ptg_with_rem_prs(gbp, ptgs)
+            self.verify_traffic(fip, vm10, ip11)
 
-        print "Cleaning up the setup after testing...\n"
-        self.cleanup(vm_list, gbp)
-        self._admin_delete_port(pfip)
-        self._admin_delete_network(ext_net1)
+            print("Traffic verification for diff_host\n")
+            self.update_ptg_with_no_prs()
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_no_rule(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_icmp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_tcp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_udp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_icmp_tcp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_icmp_udp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_tcp_udp(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_all_proto(gbp, ptgs, policy_rule_set)
+            self.verify_traffic(fip, vm10, ip12)
+            self.update_ptg_with_rem_prs(gbp, ptgs)
+            self.verify_traffic(fip, vm10, ip12)
+        except Exception as e:
+            raise e
+        finally:
+            self.cleanup_ew(gbp)
 
     def update_ptg_with_no_prs(self):
 
@@ -191,3 +191,4 @@ class EastWest(create_resources.CreateResources, gbputils.GBPScenario, osutils.O
         self._remote_command("root", "noir0123", fip, command3, vm)
         self._remote_command("root", "noir0123", fip, command4, vm)
         self._remote_command("root", "noir0123", fip, command5, vm)
+

@@ -19,129 +19,134 @@ class EastWest(create_resources.CreateResources, osutils.OSScenario, gbputils.GB
 
     def run(self, controller_ip, image, flavor, L3OUT1, L3OUT1_NET, extrtr_net1, nova_az, plugin_type):
 
-        gbp = self.gbp_client(controller_ip, "admin", "noir0123", "admin")
+        try:
+            created_resources={}
+            gbp = self.gbp_client(controller_ip, "admin", "noir0123", "admin")
 
-        policy_rule_set, policy_rules = self.create_gbp_policy_rule_set_east_west(gbp)
+            policy_rule_set, policy_rules = self.create_gbp_policy_rule_set_east_west(gbp)
 
-        l3p = self.create_gbp_l3policy(gbp, "demo_same_ptg_l2p_l3p",
-                                       **{"ip_pool": "5.5.5.0/24", "subnet_prefix_length": "28"})
-        l2p = self.create_gbp_l2policy(gbp, "demo_same_ptg_l2p_l3p_bd", False, False, **{"l3_policy_id": l3p})
-        ptg = self.create_gbp_policy_target_group(gbp, "demo_same_ptg_l2p_l3p_ptg", **{"l2_policy_id": l2p})
+            l3p = self.create_gbp_l3policy(gbp, "demo_same_ptg_l2p_l3p",
+                                           **{"ip_pool": "5.5.5.0/24", "subnet_prefix_length": "28"})
+            l2p = self.create_gbp_l2policy(gbp, "demo_same_ptg_l2p_l3p_bd", False, False, **{"l3_policy_id": l3p})
+            ptg = self.create_gbp_policy_target_group(gbp, "demo_same_ptg_l2p_l3p_ptg", **{"l2_policy_id": l2p})
 
-        pt1, port1 = self.create_gbp_policy_target(gbp, "vm1_data_pt", "demo_same_ptg_l2p_l3p_ptg", 1)
-        pt2, port2 = self.create_gbp_policy_target(gbp, "vm2_data_pt", "demo_same_ptg_l2p_l3p_ptg", 1)
-        pt3, port3 = self.create_gbp_policy_target(gbp, "vm3_data_pt", "demo_same_ptg_l2p_l3p_ptg", 1)
+            pt1, port1 = self.create_gbp_policy_target(gbp, "vm1_data_pt", "demo_same_ptg_l2p_l3p_ptg", 1)
+            pt2, port2 = self.create_gbp_policy_target(gbp, "vm2_data_pt", "demo_same_ptg_l2p_l3p_ptg", 1)
+            pt3, port3 = self.create_gbp_policy_target(gbp, "vm3_data_pt", "demo_same_ptg_l2p_l3p_ptg", 1)
 
-        print "Create Shared External Network as Management network\n"
-        ext_net1 = self._admin_create_network(L3OUT1, {"shared": True, "router:external": True,
-                                                         "apic:distinguished_names": {"ExternalNetwork": "uni/tn-common/out-"+L3OUT1+"/instP-"+L3OUT1_NET}})
-        ext_sub1 = self._admin_create_subnet(ext_net1, {"cidr": '50.50.50.0/28', "enable_dhcp": True}, None)
-        port_create_args = {}
-        port_create_args.update({"port_security_enabled": "false"})
-        pfip = self._admin_create_port(ext_net1, port_create_args)
-        pfip_id = pfip.get('port', {}).get('id')
-        nics = [{"port-id": pfip_id}, {"port-id": port1}]
-        kwargs = {}
-        kwargs.update({'nics': nics})
-        kwargs.update({"availability_zone": nova_az})
-        vm1 = self._admin_boot_server(image, flavor, "VM1", False, **kwargs)
+            print "Create Shared External Network as Management network\n"
+            ext_net1 = self._admin_create_network(L3OUT1, {"shared": True, "router:external": True,
+                                                             "apic:distinguished_names": {"ExternalNetwork": "uni/tn-common/out-"+L3OUT1+"/instP-"+L3OUT1_NET}})
+            ext_sub1 = self._admin_create_subnet(ext_net1, {"cidr": '50.50.50.0/28', "enable_dhcp": True}, None)
+            created_resources["networks"]=[ext_net1]
 
-        vm2 = self.admin_boot_server(port2, image, flavor, "VM2", **{"availability_zone": nova_az})
-        vm3 = self.admin_boot_server(port3, image, flavor, "VM3")
+            port_create_args = {}
+            port_create_args.update({"port_security_enabled": "false"})
+            pfip = self._admin_create_port(ext_net1, port_create_args)
+            pfip_id = pfip.get('port', {}).get('id')
+            nics = [{"port-id": pfip_id}, {"port-id": port1}]
+            kwargs = {}
+            kwargs.update({'nics': nics})
+            kwargs.update({"availability_zone": nova_az})
+            vm1 = self._admin_boot_server(image, flavor, "VM1", False, **kwargs)
+            created_resources["vms"]=[vm1]
 
-        vm_list = [vm1, vm2, vm3]
-        fip = pfip.get('port', {}).get('fixed_ips')[0].get('ip_address')
-        ip2 = self._admin_show_port({"port": {"id": port2}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
-        ip3 = self._admin_show_port({"port": {"id": port3}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
+            vm2 = self.admin_boot_server(port2, image, flavor, "VM2", **{"availability_zone": nova_az})
+            created_resources["vms"].append(vm2)
+            vm3 = self.admin_boot_server(port3, image, flavor, "VM3")
+            created_resources["vms"].append(vm3)
 
-        print "Configuring multi-interface in VM\n"
-        command0 = self.command_for_vm_config_with_route(extrtr_net1)
-        self._remote_command("root", "noir0123", fip, command0, vm1)
+            fip = pfip.get('port', {}).get('fixed_ips')[0].get('ip_address')
+            ip2 = self._admin_show_port({"port": {"id": port2}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
+            ip3 = self._admin_show_port({"port": {"id": port3}}).get('port', {}).get('fixed_ips')[0].get('ip_address')
 
-        print("Traffic verification for same_host\n")
-        for flag in ['enforced', 'unenforced']:
-            print "Run the Intra-EPG TestSuite with %s" %(flag)
-            if flag == 'enforced':
-                if plugin_type:
-                    self.update_gbp_policy_target_group(gbp, ptg, "uuid", **{"intra_ptg_allow": False})
-                    self.sleep_between(5, 7)
+            print "Configuring multi-interface in VM\n"
+            command0 = self.command_for_vm_config_with_route(extrtr_net1)
+            self._remote_command("root", "noir0123", fip, command0, vm1)
+
+            print("Traffic verification for same_host\n")
+            for flag in ['enforced', 'unenforced']:
+                print "Run the Intra-EPG TestSuite with %s" %(flag)
+                if flag == 'enforced':
+                    if plugin_type:
+                        self.update_gbp_policy_target_group(gbp, ptg, "uuid", **{"intra_ptg_allow": False})
+                        self.sleep_between(5, 7)
+                    else:
+                        #####################################################
+                        # add enforced to ptg
+                        #########################
+                        pass
+                    print "Expected traffic verification should FAIL\n"
                 else:
-                    #####################################################
-                    # add enforced to ptg
-                    #########################
-                    pass
-                print "Expected traffic verification should FAIL\n"
-            else:
-                if plugin_type:
-                    self.update_gbp_policy_target_group(gbp, ptg, "uuid", **{"intra_ptg_allow": True})
-                    self.sleep_between(5, 7)
+                    if plugin_type:
+                        self.update_gbp_policy_target_group(gbp, ptg, "uuid", **{"intra_ptg_allow": True})
+                        self.sleep_between(5, 7)
+                    else:
+                        #####################################################
+                        # add enforced to ptg
+                        #########################
+                        pass
+                    print "Expected traffic verification should PASS\n"
+
+                self.update_ptg_with_no_prs()
+                self.verify_traffic(fip, vm1, ip2)
+                self.update_ptg_with_no_rule(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip2)
+                self.update_ptg_with_icmp(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip2)
+                self.update_ptg_with_tcp(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip2)
+                self.update_ptg_with_icmp_tcp(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip2)
+                self.update_ptg_with_icmp_udp(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip2)
+                self.update_ptg_with_all_proto(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip2)
+                self.update_ptg_with_rem_prs(gbp, ptg)
+                self.verify_traffic(fip, vm1, ip2)
+
+            print("Traffic verification for diff_host_diff_leaf\n")
+            for flag in ['enforced', 'unenforced']:
+                print "Run the Intra-EPG TestSuite with %s" %(flag)
+                if flag == 'enforced':
+                    if plugin_type:
+                        self.update_gbp_policy_target_group(gbp, ptg, "uuid", **{"intra_ptg_allow": False})
+                    else:
+                        #####################################################
+                        # add enforced to ptg
+                        #########################
+                        pass
+                    print "Expected traffic verification should FAIL\n"
                 else:
-                    #####################################################
-                    # add enforced to ptg
-                    #########################
-                    pass
-                print "Expected traffic verification should PASS\n"
+                    if plugin_type:
+                        self.update_gbp_policy_target_group(gbp, ptg, "uuid", **{"intra_ptg_allow": True})
+                    else:
+                        #####################################################
+                        # add enforced to ptg
+                        #########################
+                        pass
+                    print "Expected traffic verification should PASS\n"
 
-            self.update_ptg_with_no_prs()
-            self.verify_traffic(fip, vm1, ip2)
-            self.update_ptg_with_no_rule(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip2)
-            self.update_ptg_with_icmp(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip2)
-            self.update_ptg_with_tcp(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip2)
-            self.update_ptg_with_icmp_tcp(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip2)
-            self.update_ptg_with_icmp_udp(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip2)
-            self.update_ptg_with_all_proto(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip2)
-            self.update_ptg_with_rem_prs(gbp, ptg)
-            self.verify_traffic(fip, vm1, ip2)
-
-        print("Traffic verification for diff_host_diff_leaf\n")
-        for flag in ['enforced', 'unenforced']:
-            print "Run the Intra-EPG TestSuite with %s" %(flag)
-            if flag == 'enforced':
-                if plugin_type:
-                    self.update_gbp_policy_target_group(gbp, ptg, "uuid", **{"intra_ptg_allow": False})
-                else:
-                    #####################################################
-                    # add enforced to ptg
-                    #########################
-                    pass
-                print "Expected traffic verification should FAIL\n"
-            else:
-                if plugin_type:
-                    self.update_gbp_policy_target_group(gbp, ptg, "uuid", **{"intra_ptg_allow": True})
-                else:
-                    #####################################################
-                    # add enforced to ptg
-                    #########################
-                    pass
-                print "Expected traffic verification should PASS\n"
-
-            self.update_ptg_with_no_prs()
-            self.verify_traffic(fip, vm1, ip3)
-            self.update_ptg_with_no_rule(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip3)
-            self.update_ptg_with_icmp(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip3)
-            self.update_ptg_with_tcp(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip3)
-            self.update_ptg_with_icmp_tcp(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip3)
-            self.update_ptg_with_icmp_udp(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip3)
-            self.update_ptg_with_all_proto(gbp, ptg, policy_rule_set)
-            self.verify_traffic(fip, vm1, ip3)
-            self.update_ptg_with_rem_prs(gbp, ptg)
-            self.verify_traffic(fip, vm1, ip3)
-
-        print "Cleaning up the setup after testing...\n"
-        self.cleanup(vm_list, gbp)
-        self._admin_delete_port(pfip)
-        self._admin_delete_network(ext_net1)
+                self.update_ptg_with_no_prs()
+                self.verify_traffic(fip, vm1, ip3)
+                self.update_ptg_with_no_rule(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip3)
+                self.update_ptg_with_icmp(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip3)
+                self.update_ptg_with_tcp(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip3)
+                self.update_ptg_with_icmp_tcp(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip3)
+                self.update_ptg_with_icmp_udp(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip3)
+                self.update_ptg_with_all_proto(gbp, ptg, policy_rule_set)
+                self.verify_traffic(fip, vm1, ip3)
+                self.update_ptg_with_rem_prs(gbp, ptg)
+                self.verify_traffic(fip, vm1, ip3)
+        except Exception as e:
+            raise e
+        finally:
+            self.cleanup_ew(created_resources, gbp)
 
     def update_ptg_with_no_prs(self):
 
