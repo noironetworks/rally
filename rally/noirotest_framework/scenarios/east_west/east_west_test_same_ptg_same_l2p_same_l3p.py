@@ -146,7 +146,7 @@ class EastWest(create_resources.CreateResources, osutils.OSScenario, gbputils.GB
         except Exception as e:
             raise e
         finally:
-            self.cleanup_ew(created_resources, gbp)
+            self.cleanup_ew(gbp)
 
     def update_ptg_with_no_prs(self):
 

@@ -1,0 +1,99 @@
+{
+    "ScenarioPlugin.east_west_test_same_ptg_same_l2p_same_l3p": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "image": {{image}},
+                "flavor": {{flavor}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "nova_az": {{nova_az}},
+                "extrtr_net1": {{extrtr_net1}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.east_west_test_diff_ptg_same_l2p_l3p": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "image": {{image}},
+                "flavor": {{flavor}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "extrtr_net1": {{extrtr_net1}},
+                "nova_az": {{nova_az}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.east_west_test_diff_ptg_diff_l2p_same_l3p": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "image": {{image}},
+                "flavor": {{flavor}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "extrtr_net1": {{extrtr_net1}},
+                "nova_az": {{nova_az}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.east_west_test_diff_ptg_diff_l2p_diff_l3p": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "image": {{image}},
+                "flavor": {{flavor}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "extrtr_net1": {{extrtr_net1}},
+                "nova_az": {{nova_az}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ]
+}

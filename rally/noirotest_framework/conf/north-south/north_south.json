@@ -1,0 +1,357 @@
+{
+    "ScenarioPlugin.north_south_test1": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test2": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test3": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test4": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test5": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "gwip2_extrtr": {{gwip2_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test6": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "gwip2_extrtr": {{gwip2_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test7": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test8": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test9": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test10": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ],
+    "ScenarioPlugin.north_south_test12": [
+        {
+            "args": {
+                "controller_ip": {{controller_ip}},
+                "L3OUT1": {{L3OUT1}},
+                "L3OUT1_NET": {{L3OUT1_NET}},
+                "L3OUT1_VRF": {{L3OUT1_VRF}},
+                "L3OUT2" : {{L3OUT2}},
+                "L3OUT2_NET": {{L3OUT2_NET}},
+                "L3OUT2_VRF": {{L3OUT2_VRF}},
+                "flavor": {{flavor}},
+                "image": {{image}},
+                "ext_rtr" : {{ext_rtr}},
+                "extrtr_ip1" : {{extrtr_ip1}},
+                "extrtr_ip2": {{extrtr_ip2}},
+                "gwip1_extrtr": {{gwip1_extrtr}},
+                "gwip2_extrtr": {{gwip2_extrtr}},
+                "nova_az": {{nova_az}},
+                "plugin_type": {{plugin_type}}
+            },
+            "runner": {
+                "type": "serial",
+                "times": 1,
+                "concurrency": 1
+            },
+            "context": {
+                "users": {
+                    "tenants": 1,
+                    "users_per_tenant": 1
+                 }
+            }
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "L3OUT2_NET": "sauto_l3out-2_epg", 
+    "extrtr_net1": "1.108.1.0/24", 
+    "dual_stack": false, 
+    "L3OUT1": "sauto_l3out-1", 
+    "image": " 85f4a5d4-74a5-4435-b9a6-09415f2b9379 ", 
+    "gwip2_extrtr": "1.108.2.254", 
+    "L3OUT2": "sauto_l3out-2", 
+    "controller_ip": "10.30.120.116", 
+    "ext_rtr": "10.30.120.119", 
+    "L3OUT1_VRF": "sauto_l3out-1_vrf", 
+    "extrtr_ip1": "1.108.1.1", 
+    "extrtr_ip2": "1.108.2.1", 
+    "L3OUT2_VRF": "sauto_l3out-2_vrf", 
+    "flavor": " tiny1                                ", 
+    "nova_az": "gbp_zone", 
+    "L3OUT1_NET": "sauto_l3out-1_epg", 
+    "gwip1_extrtr": "1.108.1.254", 
+    "plugin_type": "merged"
+}

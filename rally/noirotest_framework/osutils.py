@@ -609,25 +609,24 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
                         fip["id"], wait=True)
 
     def add_route_in_extrtr(self, extrtr_ip, route, nexthop, action="add"):
-
-    print "adding routes in external-router-vm\n"
-    if action == "add":
-        command = {
+        print "adding routes in external-router-vm\n"
+        if action == "add":
+            command = {
                     "interpreter": "/bin/sh",
                     "script_inline": "sudo ip route add "+route+" via "+nexthop+";ip route"
                 }
-    if action == "update":
-        command = {
+        if action == "update":
+            command = {
                     "interpreter": "/bin/sh",
                     "script_inline": "sudo ip route del "+route+";sudo ip route add "+route+" via "+nexthop+";ip route"
                 }
-    self._remote_command_wo_server("noiro", "noir0123", extrtr_ip, command)
+        self._remote_command_wo_server("noiro", "noir0123", extrtr_ip, command)
 
     @atomic.action_timer("vm.delete_floating_ip")
     def cleanup_floating_ip(self):
 
-    fips = self.admin_clients("neutron").list_floatingips().get("floatingips")
-    for fip in fips:
+        fips = self.admin_clients("neutron").list_floatingips().get("floatingips")
+        for fip in fips:
             if not isinstance(fip, dict):
                 LOG.warning(
                     "The argument 'address' of "
