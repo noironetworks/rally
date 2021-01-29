@@ -1,5 +1,6 @@
 import copy
 import json
+import resource
 from rally import exceptions
 from rally.task import utils
 from rally.common import cfg
@@ -407,12 +408,13 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
         port=22
         wait_for_ping=True
         max_log_length=None
+        resource.setrlimit(resource.RLIMIT_NOFILE, (131072, 131072))
 
         try:
             if wait_for_ping:
                 self._wait_for_ping(fip)
 
-            code, out, err = self._run_command(
+            code, out, err = self.run_command(
                 fip, port, username, password, command=command)
 
             print out
@@ -464,7 +466,7 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
             if wait_for_ping:
                 self._wait_for_ping(fip)
 
-            code, out, err = self._run_command(
+            code, out, err = self.run_command(
                 fip, port, username, password, command=command)
 
             print out
@@ -501,6 +503,16 @@ class OSScenario(vm_utils.VMScenario, neutron_utils.NeutronScenario, nova_utils.
             self.add_output(complete={"title": "Script Output",
                                       "chart_plugin": "TextArea",
                                       "data": text_area_output})
+
+    def run_command(self, server_ip, port, username, password, command,
+                     pkey=None, timeout=120, interval=1):
+        pkey = pkey if pkey else self.context["user"]["keypair"]["private"]
+        ssh = sshutils.SSH(username, server_ip, port=port,
+                           pkey=pkey, password=password)
+        self._wait_for_ssh(ssh, timeout, interval)
+        res = self._run_command_over_ssh(ssh, command)
+        ssh.close()
+        return res
 
     @atomic.action_timer("vm.attach_floating_ip")
     def admin_attach_floating_ip(self, server, floating_network):
