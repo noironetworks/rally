@@ -756,7 +756,34 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
 
         return subnets
 
+    @atomic.action_timer("neutron.create_security_group")
+    def create_security_group(self, name):
+        """
+            Create a Security Group
+        """
+        security_group = {"name": name}
+        body = {"security_group": security_group}
+        return self.clients("neutron").create_security_group(body)
 
+    @atomic.action_timer("neutron.delete_security_group")
+    def delete_security_group(self, id):
+        """
+            Delete a Security Group
+        """
+        security_group = {"name": name}
+        body = {"security_group": security_group}
+        return self.clients("neutron").delete_security_group(body)
+
+    @atomic.action_timer("neutron.create_security_group_rule")
+    def create_security_group_rule(self, sg_id, protocol=None, direction=None, ethertype=None, remote_group_id=None, remote_address_group_id=None, remote_ip_prefix=None):
+        """
+            Create a Security Group Rule
+        """
+        security_group_rule = {"security_group_id":sg_id, "protocol": protocol, "direction":direction, "ethertype":ethertype, "remote_group_id": remote_group_id, "remote_address_group_id":remote_address_group_id, "remote_ip_prefix":remote_ip_prefix}
+
+        body = {"security_group_rule": security_group_rule}
+        return self.clients("neutron").create_security_group_rule(body)
+    
     @atomic.action_timer("neutron.create_address_scope")
     def create_address_scope(self, name, ip_version, shared=False, admin=False, **kwargs):
         """
