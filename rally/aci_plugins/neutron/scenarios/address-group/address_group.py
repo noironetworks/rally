@@ -24,18 +24,11 @@ class AddressGroup(create_ostack_resources.CreateOstackResources, vcpe_utils.vCP
 
     def run(self, cidr1, cidr2, access_network, nat_network, aci_nodes, image, flavor, username, password, dualstack):
 
-        networks=[]
-        interfaces=[]
-        vms=[]
-        sgs=[]
-
         try:
             net1 = self._create_network({"provider:network_type": "vlan"})
             sub1 = self._create_subnet(net1, {"cidr": cidr1},  None)
             net2 = self._create_network({"provider:network_type": "vlan"})
             sub2 = self._create_subnet(net2, {"cidr": cidr2},  None)
-
-            networks.extend([net1, net2])
 
             print( "\n Networks created - net1 and net2 \n")
 
@@ -46,12 +39,8 @@ class AddressGroup(create_ostack_resources.CreateOstackResources, vcpe_utils.vCP
             self._add_interface_router(sub1['subnet'], router.get("router"))
             self._add_interface_router(sub2['subnet'], router.get("router"))
 
-            interfaces.extend([sub1,sub2])
-
             SG_NAME = uuid.uuid4().hex
             sg = self.create_security_group(SG_NAME)
-
-            sgs.extend([sg])
 
             print( "\n Security Group created \n")
 
@@ -65,14 +54,11 @@ class AddressGroup(create_ostack_resources.CreateOstackResources, vcpe_utils.vCP
             vm12 = self.boot_vm(pfip12.get('port', {}).get('id'), image, flavor, key_name=key_name)
             self.sleep_between(50, 60)
 
-            vms.extend([vm11, vm12])
 
             print( "\n vms created on net1 \n")
 
             SG_NAME = uuid.uuid4().hex
             sg1 = self.create_security_group(SG_NAME)
-
-            sgs.extend([sg1])
 
             print( "\n Security Group created \n")
 
@@ -85,8 +71,6 @@ class AddressGroup(create_ostack_resources.CreateOstackResources, vcpe_utils.vCP
             pfip2 = self._create_port(net2, port_create_args)
             vm2 = self.boot_vm([pfip2_1_id, pfip2.get('port', {}).get('id')], image, flavor, key_name=key_name)
             self.sleep_between(90, 100)
-
-            vms.extend([vm2])
 
             print( "\n vm created on net2 \n")
 
@@ -134,11 +118,5 @@ class AddressGroup(create_ostack_resources.CreateOstackResources, vcpe_utils.vCP
 
         except AssertionError as msg:
             raise msg
-        finally:
-            import pdb;pdb.set_trace()
-            if vms:self.delete_servers(vms)
-            if interfaces:self.delete_router_interface(interfaces, router)
-            if networks:self.delete_network(networks)
-            if sgs:self.delete_security_group(sgs)
-            self.openstack('address group delete '+ AG_NAME,cloud='',)
+        
                 
