@@ -53,7 +53,7 @@ class SFCRemoveFlowclassifier(create_ostack_resources.CreateOstackResources, vcp
         fip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
         fip2 = p2.get('port', {}).get('fixed_ips')[0].get('ip_address')
 
-        print "\nConfiguring destination-vm for traffic verification..\n"
+        print("\nConfiguring destination-vm for traffic verification..\n")
         if dualstack:
             command1 = {
                     "interpreter": "/bin/sh",
@@ -94,17 +94,17 @@ class SFCRemoveFlowclassifier(create_ostack_resources.CreateOstackResources, vcp
                  pc = self._create_port_chain([ppg], [fc1, fc2])
             self.sleep_between(30, 40)
 
-            print"Traffic verification with multiple flow classifiers"
+            print("Traffic verification with multiple flow classifiers")
             self._remote_command(username, password, fip1, command2, src_vm)
 
-            print"Removing a flow classifier from the chain..."
+            print("Removing a flow classifier from the chain...")
             if dualstack:
                 self._update_port_chain(pc, [ppg], [fc1, fc3])
             else:
                 self._update_port_chain(pc, [ppg], [fc1])
             self.sleep_between(30,40)
 
-            print"Traffic verification after removing a flow classifier\n"
+            print("Traffic verification after removing a flow classifier\n")
             self._remote_command(username, password, fip1, command2, src_vm)
         except Exception as e:
             raise e

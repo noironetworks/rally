@@ -41,7 +41,7 @@ class SFCAllowTraffic(create_ostack_resources.CreateOstackResources, vcpe_utils.
         fip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
         fip2 = p2.get('port', {}).get('fixed_ips')[0].get('ip_address')
         
-        print "\nConfiguring destination-vm for traffic verification..\n"
+        print("\nConfiguring destination-vm for traffic verification..\n")
         if dualstack:
             command1 = {
                     "interpreter": "/bin/sh",
@@ -68,10 +68,10 @@ class SFCAllowTraffic(create_ostack_resources.CreateOstackResources, vcpe_utils.
                     "script_inline": "ping -c 5 192.168.200.101;ping -c 5 192.168.200.102;ping -c 5 192.168.200.103"
                 }
         self._remote_command(username, password, fip2, command1, dest_vm)
-        print "\nTraffic verification before SFC\n"
+        print("\nTraffic verification before SFC\n")
         self._remote_command(username, password, fip1, command2, src_vm)
         try:
-            print "\nCreating a single service function chain...\n"
+            print("\nCreating a single service function chain...\n")
             pp = self._create_port_pair(pin, pout)
             ppg = self._create_port_pair_group([pp])
             fc = self._create_flow_classifier(src_cidr, dest_cidr, net1_id, net2_id)
@@ -81,7 +81,7 @@ class SFCAllowTraffic(create_ostack_resources.CreateOstackResources, vcpe_utils.
             else:
                 pc = self._create_port_chain([ppg], [fc])
             self.sleep_between(30, 40)
-            print "\nTraffic verification after creating SFC\n"
+            print("\nTraffic verification after creating SFC\n")
             self._remote_command(username, password, fip1, command2, src_vm)
         except Exception as e:
             raise e

@@ -46,7 +46,7 @@ class SFCAddPortpair(create_ostack_resources.CreateOstackResources, vcpe_utils.v
         fip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
         fip2 = p2.get('port', {}).get('fixed_ips')[0].get('ip_address')
 
-        print "\nConfiguring destination-vm for traffic verification..\n"
+        print("\nConfiguring destination-vm for traffic verification..\n")
         if dualstack:
             command1 = {
                 "interpreter": "/bin/sh",
@@ -90,17 +90,17 @@ class SFCAddPortpair(create_ostack_resources.CreateOstackResources, vcpe_utils.v
                 pc = self._create_port_chain([ppg], [fc])
             self.sleep_between(30, 40)
 
-            print"Traffic verification with existing SFC..."
+            print("Traffic verification with existing SFC...")
             self._remote_command(username, password, fip1, command2, src_vm)
 
-            print"Adding a new port pair to the existing chain..."
+            print("Adding a new port pair to the existing chain...")
             service_vm14, pin4, pout4 = self.boot_server(net_list[2], port_create_args, service_image1, flavor,
                                                          net2=net_list[3], service_vm=True, key_name=key_name)
             pp4 = self._create_port_pair(pin4, pout4)
             self._update_port_pair_group(ppg, [pp1, pp2, pp3, pp4])
             self.sleep_between(30, 40)
 
-            print"Traffic verification after adding a new port pair"
+            print("Traffic verification after adding a new port pair")
             self._remote_command(username, password, fip1, command2, src_vm)
         except Exception as e:
             raise e

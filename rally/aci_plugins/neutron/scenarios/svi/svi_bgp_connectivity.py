@@ -65,7 +65,7 @@ class SVIBGPConnectivity(create_ostack_resources.CreateOstackResources, vcpe_uti
             fip1 = pfip1.get('port', {}).get('fixed_ips')[0].get('ip_address')
             fip2 = pfip2.get('port', {}).get('fixed_ips')[0].get('ip_address')
 
-            print "\nConfiguring the VMs...\n"
+            print("\nConfiguring the VMs...\n")
             if dualstack:
                 self.configure_vm(username, password, fip1, vm1, "svi_orchest_vm1_dual.sh")
                 self.configure_vm(username, password, fip2, vm2, "svi_orchest_vm2_dual.sh")
@@ -76,7 +76,7 @@ class SVIBGPConnectivity(create_ostack_resources.CreateOstackResources, vcpe_uti
             self.run_bird_conf(username, password, fip2, vm2, "bird_svi.conf")
             self.sleep_between(100, 120)
             
-            print "\nValidating BGP session from VM1...\n"
+            print("\nValidating BGP session from VM1...\n")
             self.validate_bgp_session(username, password, [fip1, fip2],  [vm1,vm2], no_demo=True)
         except Exception as e:
             raise e

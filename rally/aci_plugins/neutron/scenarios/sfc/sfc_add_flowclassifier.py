@@ -91,10 +91,10 @@ class SFCAddFlowclassifier(create_ostack_resources.CreateOstackResources, neutro
                 pc = self._create_port_chain([ppg], [fc1])
             self.sleep_between(30, 40)
 
-            print"Traffic verification with existing flow classifier\n"
+            print("Traffic verification with existing flow classifier\n")
             self._remote_command(username, password, fip1, command2, src_vm)
 
-            print"Adding a new flow classifier to the chain..."
+            print("Adding a new flow classifier to the chain...")
             fc3 = self._create_flow_classifier(src_cidr, dest_cidr, net1_id, net2_id)
             if dualstack:
                 fc4 = self._create_flow_classifier(ipv6_cidr, ipv6_dest_cidr, net1_id, net2_id, ethertype="IPv6")
@@ -103,7 +103,7 @@ class SFCAddFlowclassifier(create_ostack_resources.CreateOstackResources, neutro
                 self._update_port_chain(pc, [ppg], [fc1, fc3])
             self.sleep_between(30, 40)
 
-            print"Traffic verification with a new flow classifier\n"
+            print("Traffic verification with a new flow classifier\n")
             self._remote_command(username, password, fip1, command2, src_vm)
         except Exception as e:
             raise e

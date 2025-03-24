@@ -83,10 +83,10 @@ class TrunkAddSubport(create_ostack_resources.CreateOstackResources, vcpe_utils.
                             ip netns exec dogs ping -c 5 " + p3_add
                         }
 
-            print "\nVerify traffic between the networks through trunk\n"
+            print("\nVerify traffic between the networks through trunk\n")
             self._remote_command(username, password, fip, command1, vm1)
 
-            print "\nAdding a new subport into the trunk...\n"
+            print("\nAdding a new subport into the trunk...\n")
             subp2_mac, sp2 = self.crete_port_and_add_trunk(net_list[2], port_create_args, trunk, seg_id=20)
             
             command = {
@@ -97,7 +97,7 @@ class TrunkAddSubport(create_ostack_resources.CreateOstackResources, vcpe_utils.
                     }
             self._remote_command(username, password, fip, command, vm1)
 
-            print "\nVerify traffic to the new vlan through trunk\n"
+            print("\nVerify traffic to the new vlan through trunk\n")
             self._remote_command(username, password, fip, command1, vm1)
         except Exception as e:
             raise e

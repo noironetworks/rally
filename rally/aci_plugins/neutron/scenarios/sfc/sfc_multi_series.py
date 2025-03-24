@@ -80,7 +80,7 @@ class SFCMultiSeries(create_ostack_resources.CreateOstackResources, vcpe_utils.v
         fip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
         fip2 = p2.get('port', {}).get('fixed_ips')[0].get('ip_address')
         
-        print "\nConfiguring destination-vm for traffic verification..\n"
+        print("\nConfiguring destination-vm for traffic verification..\n")
         if dualstack:
             command1 = {
                     "interpreter": "/bin/sh",
@@ -113,10 +113,10 @@ class SFCMultiSeries(create_ostack_resources.CreateOstackResources, vcpe_utils.v
         
         self._remote_command(username, password, fip2, command1, dest_vm)
         try:
-            print"Traffic verification before SFC"
+            print("Traffic verification before SFC")
             self._remote_command(username, password, fip1, command2, src_vm)
 
-            print"Creating series multi service function chain..."
+            print("Creating series multi service function chain...")
             pp1 = self._create_port_pair(pin1, pout1)
             ppg1 = self._create_port_pair_group([pp1])
             pp2 = self._create_port_pair(pin2, pout2)
@@ -131,7 +131,7 @@ class SFCMultiSeries(create_ostack_resources.CreateOstackResources, vcpe_utils.v
                 pc = self._create_port_chain([ppg1, ppg2, ppg3], [fc])
             self.sleep_between(30, 40)
             
-            print"Traffic verification after creating SFC"
+            print("Traffic verification after creating SFC")
             self._remote_command(username, password, fip1, command2, src_vm)
         except Exception as e:
             raise e

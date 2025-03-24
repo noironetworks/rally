@@ -73,7 +73,7 @@ class SVIReachabilityBetweenVMs(create_ostack_resources.CreateOstackResources, v
                 self.configure_vm(username, password, fip1, vm1, "svi_orchest_vm1.sh")
                 self.configure_vm(username, password, fip2, vm2, "svi_orchest_vm2.sh")
 
-            print "\nVerifying the traffic between SVI VMs from VM1...\n"
+            print("\nVerifying the traffic between SVI VMs from VM1...\n")
             if dualstack:
                 command1 = {
                             "interpreter": "/bin/sh",
@@ -95,7 +95,7 @@ class SVIReachabilityBetweenVMs(create_ostack_resources.CreateOstackResources, v
                             "script_inline": "ping -c 5 192.168.10.101"
                         }
             self._remote_command(username, password, fip1, command1, vm1)
-            print "\nVerifying the traffic between SVI VMs from VM2...\n"
+            print("\nVerifying the traffic between SVI VMs from VM2...\n")
             self._remote_command(username, password, fip2, command2, vm2)
         except Exception as e:
             raise e

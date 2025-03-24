@@ -44,7 +44,7 @@ class SFCRemovePortpair(create_ostack_resources.CreateOstackResources, vcpe_util
         fip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
         fip2 = p2.get('port', {}).get('fixed_ips')[0].get('ip_address')
 
-        print "\nConfiguring destination-vm for traffic verification..\n"
+        print("\nConfiguring destination-vm for traffic verification..\n")
         if dualstack:
             command1 = {
                     "interpreter": "/bin/sh",
@@ -84,15 +84,15 @@ class SFCRemovePortpair(create_ostack_resources.CreateOstackResources, vcpe_util
                 pc = self._create_port_chain([ppg], [fc])
             self.sleep_between(30, 40)
 
-            print "\nTraffic verification with existing SFC\n"
+            print("\nTraffic verification with existing SFC\n")
             self._remote_command(username, password, fip1, command2, src_vm)
 
-            print "Removing a port pair from the chain..."
+            print("Removing a port pair from the chain...")
             self._update_port_pair_group(ppg, [pp1, pp2])
             self._delete_port_pair(pp3)
             self.sleep_between(30, 40)
 
-            print "\nTraffic verification after removing a port pair from the chain\n"
+            print("\nTraffic verification after removing a port pair from the chain\n")
             self._remote_command(username, password, fip1, command2, src_vm)
         except Exception as e:
             raise e

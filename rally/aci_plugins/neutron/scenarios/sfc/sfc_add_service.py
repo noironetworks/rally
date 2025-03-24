@@ -40,7 +40,7 @@ class SFCAddService(create_ostack_resources.CreateOstackResources, vcpe_utils.vC
         fip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
         fip2 = p2.get('port', {}).get('fixed_ips')[0].get('ip_address')
     
-        print "\nConfiguring destination-vm for traffic verification..\n"
+        print("\nConfiguring destination-vm for traffic verification..\n")
         if dualstack:
             command1 = {
                     "interpreter": "/bin/sh",
@@ -79,10 +79,10 @@ class SFCAddService(create_ostack_resources.CreateOstackResources, vcpe_utils.vC
                 pc = self._create_port_chain([ppg1], [fc])
 
             self.sleep_between(30, 40)
-            print"Traffic verification with a single SFC\n"
+            print("Traffic verification with a single SFC\n")
             self._remote_command(username, password, fip1, command2, src_vm)
 
-            print"Adding a new function to the chain..."
+            print("Adding a new function to the chain...")
             service_vm2, pin2, pout2 = self.create_service_vm(router, service_image2, flavor, '3.3.0.0/24', '4.4.0.0/24',
             src_cidr=src_cidr, dualstack=dualstack, ipv6_src_cidr=ipv6_cidr, left_v6_cidr='c:c::/64', right_v6_cidr='d:d::/64')
             pp2 = self._create_port_pair(pin2, pout2)
@@ -93,7 +93,7 @@ class SFCAddService(create_ostack_resources.CreateOstackResources, vcpe_utils.vC
                 self._update_port_chain(pc, [ppg1, ppg2], [fc])
             self.sleep_between(30, 40)
 
-            print"Traffic verification after adding a new function"
+            print("Traffic verification after adding a new function")
             self._remote_command(username, password, fip1, command2, src_vm)
         except Exception as e:
             raise e
