@@ -73,7 +73,7 @@ class TrunkIntervlanTraffic(create_ostack_resources.CreateOstackResources, vcpe_
                                 ip netns exec dogs udhcpc -i subp2"
                     }
 
-            print "\nAdding sub-interfaces into the VMs...\n"
+            print("\nAdding sub-interfaces into the VMs...\n")
             self._remote_command(username, password, fip1, command1, vm_tr1)
             self._remote_command(username, password, fip2, command2, vm_tr2)
             self.sleep_between(30, 40)
@@ -109,7 +109,7 @@ class TrunkIntervlanTraffic(create_ostack_resources.CreateOstackResources, vcpe_
                                 ip netns exec dogs ping -c 5 " + subp2_add
                         }
             
-            print "\nInter-vlan traffic verification from VM1\n"
+            print("\nInter-vlan traffic verification from VM1\n")
             self._remote_command(username, password, fip1, command, vm_tr1)
 
             if dualstack:
@@ -130,7 +130,7 @@ class TrunkIntervlanTraffic(create_ostack_resources.CreateOstackResources, vcpe_
                                     ip netns exec cats ping -c 10 " + subp3_add + ";ip netns exec dogs ping -c 10 " + subp1_add
                         }
 
-            print "\nInter-vlan traffic verification from VM2\n"
+            print("\nInter-vlan traffic verification from VM2\n")
             self._remote_command(username, password, fip2, command, vm_tr2)
         except Exception as e:
             raise e 

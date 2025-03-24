@@ -62,7 +62,7 @@ class SimpleTrunk(create_ostack_resources.CreateOstackResources, vcpe_utils.vCPE
                         ip link set subp2 netns dogs;ip netns exec dogs ifconfig subp2 hw ether " + subp2_mac + ";\
                         ip netns exec dogs udhcpc -i subp2"
                     }
-            print "\nAdding sub-interfaces into the VM...\n"
+            print("\nAdding sub-interfaces into the VM...\n")
             self._remote_command(username, password, fip, command, vm1)
             self.sleep_between(30, 40)
 
@@ -79,7 +79,7 @@ class SimpleTrunk(create_ostack_resources.CreateOstackResources, vcpe_utils.vCPE
                             "script_inline": "ping -c 5 " + p1_add
                         }
 
-            print "\nVerify traffic from the default namespace\n"
+            print("\nVerify traffic from the default namespace\n")
             self._remote_command(username, password, fip, command, vm1)
         except Exception as e:
             raise e

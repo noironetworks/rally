@@ -113,7 +113,7 @@ class SingleCustomerTwoSitesSingleSFC(create_ostack_resources.CreateOstackResour
 
     def cleanup(self):
 
-        print "Cleaning up setup after testing..."
+        print("Cleaning up setup after testing...")
         self.delete_servers(self.resources_created["vms"])
         self.delete_trunks(self.resources_created["trunks"])
         self.delete_ports(self.resources_created["ports"])

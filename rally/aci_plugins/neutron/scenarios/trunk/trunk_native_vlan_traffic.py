@@ -68,7 +68,7 @@ class TrunkNativevlanTraffic(create_ostack_resources.CreateOstackResources, vcpe
                                 ip link set subp2 netns dogs;ip netns exec dogs ifconfig subp2 hw ether " + subp4_mac + ";\
                                 ip netns exec dogs udhcpc -i subp2"
                     }
-            print "\nAdding sub-interfaces into the VMs...\n"
+            print("\nAdding sub-interfaces into the VMs...\n")
             self._remote_command(username, password, fip1, command1, vm_tr1)
             self._remote_command(username, password, fip2, command2, vm_tr2)
             self.sleep_between(30, 40)
@@ -86,9 +86,9 @@ class TrunkNativevlanTraffic(create_ostack_resources.CreateOstackResources, vcpe
                             "script_inline": "ping -c 5 " + p1_add
                             }
                 
-            print "\nTraffic verification from VM1 default namespace\n"
+            print("\nTraffic verification from VM1 default namespace\n")
             self._remote_command(username, password, fip1, command, vm_tr1)
-            print "\nTraffic verification from VM2 default namespace\n"
+            print("\nTraffic verification from VM2 default namespace\n")
             self._remote_command(username, password, fip2, command, vm_tr2)
         except Exception as e:
             raise e

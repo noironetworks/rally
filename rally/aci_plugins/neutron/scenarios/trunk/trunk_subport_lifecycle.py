@@ -87,10 +87,10 @@ class TrunkSubportLifecycle(create_ostack_resources.CreateOstackResources, vcpe_
                                     ip netns exec dogs ping -c 5 " + p3_add
                         }
 
-            print "\nVerify traffic between the networks through trunk\n"
+            print("\nVerify traffic between the networks through trunk\n")
             self._remote_command(username, password, fip, command, vm1)
 
-            print "\nRemoving a subport from the trunk...\n"
+            print("\nRemoving a subport from the trunk...\n")
             self._remove_subports_from_trunk(trunk1, subport_payload)
 
             self._add_subports_to_trunk(trunk2, subport_payload)

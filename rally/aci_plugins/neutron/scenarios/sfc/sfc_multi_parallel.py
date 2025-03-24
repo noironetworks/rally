@@ -86,7 +86,7 @@ class SFCMultiParallel(create_ostack_resources.CreateOstackResources, vcpe_utils
         fip1 = p1.get('port', {}).get('fixed_ips')[0].get('ip_address')
         fip2 = p2.get('port', {}).get('fixed_ips')[0].get('ip_address')
 
-        print "\nConfiguring destination-vm for traffic verification..\n"
+        print("\nConfiguring destination-vm for traffic verification..\n")
         if dualstack:
             command1 = {
                 "interpreter": "/bin/sh",
@@ -125,10 +125,10 @@ class SFCMultiParallel(create_ostack_resources.CreateOstackResources, vcpe_utils
 
         self._remote_command(username, password, fip2, command1, dest_vm)
 
-        print "\nTraffic verification before SFC\n"
+        print("\nTraffic verification before SFC\n")
         self._remote_command(username, password, fip1, command2, src_vm)
         try:
-            print"Creating a parallel multi service function chain..."
+            print("Creating a parallel multi service function chain...")
             pp1 = self._create_port_pair(pin1, pout1)
             ppg1 = self._create_port_pair_group([pp1])
             pp21 = self._create_port_pair(pin21, pout21)
@@ -144,7 +144,7 @@ class SFCMultiParallel(create_ostack_resources.CreateOstackResources, vcpe_utils
             else:
                 pc = self._create_port_chain([ppg1, ppg2, ppg3], [fc])
             self.sleep_between(50, 60)
-            print"Traffic verification after creating SFC\n"
+            print("Traffic verification after creating SFC\n")
             self._remote_command(username, password, fip1, command2, src_vm)
         except Exception as e:
             raise e

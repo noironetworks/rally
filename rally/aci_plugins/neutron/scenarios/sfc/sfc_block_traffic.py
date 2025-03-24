@@ -50,22 +50,22 @@ class SFCBlockTraffic(create_ostack_resources.CreateOstackResources, vcpe_utils.
                     "script_inline": "ping -c 10 " + pdest_add 
                 } 
 
-        print "\nTraffic verification before SFC\n"
+        print("\nTraffic verification before SFC\n")
         self._remote_command(username, password, fip, command, src_vm)
         try:
-            print "\nCreating a single service function chain...\n"
+            print("\nCreating a single service function chain...\n")
             pp = self._create_port_pair(pin, pout)
             ppg = self._create_port_pair_group([pp])
             fc = self._create_flow_classifier(src_cidr, dest_cidr, net1_id, net2_id)
             pc = self._create_port_chain([ppg], [fc])
             self.sleep_between(30, 40)
             
-            print "\nTraffic verification after creating SFC\n"
+            print("\nTraffic verification after creating SFC\n")
             self._remote_command(username, password, fip, command, src_vm)
             self._delete_port_chain(pc)
             self.sleep_between(30, 40)
 
-            print "Traffic verification after deleting SFC\n"
+            print("Traffic verification after deleting SFC\n")
             self._remote_command(username, password, fip, command, src_vm)
         except Exception as e:
             raise e

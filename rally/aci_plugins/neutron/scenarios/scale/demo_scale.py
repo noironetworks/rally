@@ -43,7 +43,7 @@ class DemoScale(create_ostack_resources.CreateOstackResources, vcpe_utils.vCPESc
             fip1 = pfip1.get('port', {}).get('fixed_ips')[0].get('ip_address')
             fip2 = pfip2.get('port', {}).get('fixed_ips')[0].get('ip_address')
 
-            print "\nConfiguring ACCESS-ROUTER...\n"
+            print("\nConfiguring ACCESS-ROUTER...\n")
             command1 = {
                         "interpreter": "/bin/sh",
                         "script_inline": "sudo /usr/local/bin/scale-orchest-access-router.sh -c " + str(scale)
@@ -76,7 +76,7 @@ class DemoScale(create_ostack_resources.CreateOstackResources, vcpe_utils.vCPESc
                 port_create_args["mac_address"] = 'fa:16:3e:1b:a1:' + hex_i
                 sub_mac2, sp2 = self.crete_port_and_add_trunk(net, port_create_args, trunk2, seg_id=1000 + i)
 
-                print "Creating a single service function chain for customer-" + str(i)
+                print("Creating a single service function chain for customer-" + str(i))
                 left = self._create_network({"provider:network_type": "vlan"})
                 left_sub = self._create_subnet(left, {"cidr": "1.1.0.0/24", 'host_routes': [{'destination': '10.0.0.0/16', 'nexthop': '1.1.0.1'}]}, None)
                 self.resources_created["networks"].append(left)
@@ -117,16 +117,16 @@ class DemoScale(create_ostack_resources.CreateOstackResources, vcpe_utils.vCPESc
                         "interpreter": "/bin/sh",
                         "script_file": "/usr/local/lib/python2.7/dist-packages/rally/aci_plugins/orchest/orchest_demo_scale_nat.sh"
                     }
-            print "\nConfiguring the BRAS-VM and running Bird init...\n"
+            print("\nConfiguring the BRAS-VM and running Bird init...\n")
             self._remote_command(username, password, fip1, command2, bras_vm)
             self._remote_command(username, password, fip1, command3, bras_vm)
             
-            print "\nConfiguring the NAT-VM and running Bird init...\n"
+            print("\nConfiguring the NAT-VM and running Bird init...\n")
             self._remote_command(username, password, fip2, command4, nat_vm)
             self._remote_command(username, password, fip2, command3, nat_vm)
             self.sleep_between(30,40)
             
-            print "\nValidating BGP session from BRAS-VM...\n"
+            print("\nValidating BGP session from BRAS-VM...\n")
             command5 = {
                         "interpreter": "/bin/sh",
                         "script_inline": "birdc show protocol;birdc show route" 
@@ -140,7 +140,7 @@ class DemoScale(create_ostack_resources.CreateOstackResources, vcpe_utils.vCPESc
                     }
                 self._remote_command(username, password, fip1, command6, bras_vm)
             
-            print "\nValidating BGP session from NAT-VM...\n"
+            print("\nValidating BGP session from NAT-VM...\n")
             self._remote_command(username, password, fip2, command5, nat_vm)
             for i in range(1, int(scale)+1):
                 command6 = {

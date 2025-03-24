@@ -98,7 +98,7 @@ class SVIReachabilityofBGProute(create_ostack_resources.CreateOstackResources, v
                         }
             self._remote_command(username, password, fip2, command0, vm2)
             
-            print "\nVerifying the traffic from VM1...\n"
+            print("\nVerifying the traffic from VM1...\n")
             if dualstack:
                 command1 = {
                             "interpreter": "/bin/sh",
@@ -131,7 +131,7 @@ class SVIReachabilityofBGProute(create_ostack_resources.CreateOstackResources, v
                         } 
             
             self._remote_command(username, password, fip1, command1, vm1)
-            print "\nVerifying the traffic from VM2...\n"
+            print("\nVerifying the traffic from VM2...\n")
             self._remote_command(username, password, fip2, command2, vm2)
         except Exception as e:
             raise e

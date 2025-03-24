@@ -18,7 +18,7 @@ class CreateOstackResources(vcpe_utils.vCPEScenario, vm_utils.VMScenario, neutro
     
     def create_network(self, network, name, bgp_asn, external_net, cidr, aci_nodes):
         
-        print "Creating external network with provided l3out...\n"
+        print("Creating external network with provided l3out...\n")
         try:
             net = self.clients("neutron").show_network(network)
         except Exception as ex:
@@ -32,7 +32,7 @@ class CreateOstackResources(vcpe_utils.vCPEScenario, vm_utils.VMScenario, neutro
         return net
 
     def get_token(self, apic, username, password):
-        print "Creating Token for apic...\n"
+        print("Creating Token for apic...\n")
         url = "https://"+apic+"/api/aaaLogin.json"
         payload = {
             "aaaUser": {
@@ -54,7 +54,7 @@ class CreateOstackResources(vcpe_utils.vCPEScenario, vm_utils.VMScenario, neutro
         return token
 
     def get_apic_resource(self, apic, token, name):
-        print "getting Apic resources...\n"
+        print("getting Apic resources...\n")
         url = "https://"+apic+"/api/node/class/"+name+".json"
    
         headers = {

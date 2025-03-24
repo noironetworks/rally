@@ -31,18 +31,18 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
             code, out, err = self._run_command(
                 fip, port, username, password, command=command)
             
-            print out
+            print(out)
 
             text_area_output = ["StdOut:"]
 
             if code:
-                print exceptions.ScriptError(
+                print(exceptions.ScriptError(
                     "Error running command %(command)s. "
                     "Error %(code)s: %(error)s" % {
-                        "command": command, "code": code, "error": err})
-                print "------------------------------"
+                        "command": command, "code": code, "error": err}))
+                print("------------------------------")
             else:
-                print "------------------------------"
+                print("------------------------------")
             # Let's try to load output data
             try:
                 data = json.loads(out)
@@ -68,23 +68,14 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
             self.add_output(complete={"title": "Script Output",
                                       "chart_plugin": "TextArea",
                                       "data": text_area_output})
-            
-        if "birdc show protocol" in str(command):
-            try:
-                for line in text_area_output:
-                    if ("bgp" in line) and (("Idle" in line) and ("BGP Error: Bad peer AS" in line)):
-                        raise ConnectionError("BGP not established")
-            except ConnectionError as e:
-                raise e
 
     
     @atomic.action_timer("neutron.create_port_pair")
     def _create_port_pair(self, port1, port2, **port_pair_create_args):
-
-    	port_pair_create_args = {}
-        port_pair_create_args["ingress"] = port1["port"]["id"]
-        port_pair_create_args["egress"] = port2["port"]["id"]
-        port_pair_create_args["name"] = self.generate_random_name()
+        port_pair_create_args = {}
+        port_pair_create_args["ingress"]=port1["port"]["id"]
+        port_pair_create_args["egress"]=port2["port"]["id"]
+        port_pair_create_args["name"]=self.generate_random_name()
         return self.clients("neutron").create_sfc_port_pair({"port_pair": port_pair_create_args})
 
 
@@ -117,8 +108,7 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
 
     @atomic.action_timer("neutron.create_port_pair_group")
     def _create_port_pair_group(self, portpair, **port_pair_group_create_args):
-
-    	port_pair_group_create_args = {}
+        port_pair_group_create_args = {}
         port_pair_group_create_args["port_pairs"] = [pp["port_pair"]["id"] for pp in portpair]
         port_pair_group_create_args["name"] = self.generate_random_name()
         return self.clients("neutron").create_sfc_port_pair_group({"port_pair_group": port_pair_group_create_args})
@@ -154,11 +144,14 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
 
     @atomic.action_timer("neutron.create_flow_classifier")
     def _create_flow_classifier(self, source_ip, dest_ip, log_src_net, log_dest_net, ethertype=None, **flow_classifier_create_args):
-
-    	flow_classifier_create_args = {}
+        flow_classifier_create_args = {}
         flow_classifier_create_args["source_ip_prefix"] = source_ip
         flow_classifier_create_args["destination_ip_prefix"] = dest_ip
+        #flow_classifier_create_args["logical_source_port"] = log_src_net
+        #flow_classifier_create_args["logical_destination_port"] = log_dest_net
         flow_classifier_create_args["l7_parameters"] = {"logical_source_network": log_src_net, "logical_destination_network": log_dest_net}
+        #flow_classifier_create_args["l7_parameters"] = {}
+        #flow_classifier_create_args["l7_parameters"] = {"logical_source_port": log_src_net, "logical_destination_port": log_dest_net}
         if ethertype:
             flow_classifier_create_args["ethertype"] = ethertype
         flow_classifier_create_args["name"] = self.generate_random_name()
@@ -193,8 +186,8 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
 
     @atomic.action_timer("neutron.create_port_chain")
     def _create_port_chain(self, portpairgroup, flowclassifier, **port_chain_create_args):
-
-    	port_chain_create_args = {}
+        
+        port_chain_create_args = {}
         port_chain_create_args["port_pair_groups"] = [ppg["port_pair_group"]["id"] for ppg in portpairgroup]
         port_chain_create_args["flow_classifiers"] = [fc["flow_classifier"]["id"] for fc in flowclassifier]
         port_chain_create_args["name"] = self.generate_random_name()
@@ -231,7 +224,7 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
     @atomic.action_timer("cleanup_sfc_resources")
     def cleanup_sfc(self):
         
-        print "Deleting sfc resources"
+        print("Deleting sfc resources")
         try:
             pc_list = self._list_port_chains()
             if len(pc_list):
@@ -456,18 +449,18 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
             code, out, err = self._run_command(
                 fip, port, username, password, command=command)
 
-            print out
+            print(out)
 
             text_area_output = ["StdOut:"]
 
             if code:
-                print exceptions.ScriptError(
+                print(exceptions.ScriptError(
                     "Error running command %(command)s. "
                     "Error %(code)s: %(error)s" % {
-                        "command": command, "code": code, "error": err})
-                print "------------------------------"
+                        "command": command, "code": code, "error": err}))
+                print("------------------------------")
             else:
-                print "------------------------------"
+                print("------------------------------")
             # Let's try to load output data
             try:
                 data = json.loads(out)
@@ -536,7 +529,7 @@ class vCPEScenario(vm_utils.VMScenario, scenario.OpenStackScenario):
             
             text_area_output = ["StdOut:"]
 
-            print out
+            print(out)
 
             if code:
                 raise exceptions.ScriptError(
