@@ -36,7 +36,7 @@
               - .zuul.d/*
               - tests/ci/playbooks/*
             vars:
-              rally_task: "{{ ansible_user_dir }}/{{ zuul.projects['opendev.org/openstack/rally-openstack'].src_dir }}/rally-jobs/simple-job.yaml"
+              rally_task_src_dir: "{{ ansible_user_dir }}/{{ zuul.projects['opendev.org/openstack/rally-openstack'].src_dir }}"
         - rally-verify-tempest:
             files:
               - rally/cli/commands/verify.py
