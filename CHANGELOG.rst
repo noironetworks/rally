@@ -97,10 +97,8 @@ Removed
 
 * Support for Python 3.9
 
-* ``rally deployment create --fromenv`` no longer special-cases
-  rally-openstack ``<= 1.4.0`` (it used to drop ``OS_KEY``/``https_key`` for
-  those). That release is ~7 years old and predates every currently supported
-  Python -- old rally-openstack only went up to py37 -- so the shim is gone.
+* A workaround for old rally-openstack ``<= 1.4.0`` which is ~7 years old
+  and supported up to python 3.7.
 
 Fixed
 ~~~~~
