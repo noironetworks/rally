@@ -40,7 +40,13 @@ def load() -> None:
 
         opts.register()
 
-        discover.import_modules_from_package("rally.plugins.common")
+        # NOTE(andreykurilin): `rally.plugins.common` includes deprecated
+        #   modules. As soon as they will be removed the direct import of
+        #   validators should be replaced by
+        #
+        #       discover.import_modules_from_package("rally.plugins.common")
+        from rally.plugins.common import validators  # noqa: F401
+
         discover.import_modules_from_package("rally.plugins.task")
         discover.import_modules_from_package("rally.plugins.verification")
 

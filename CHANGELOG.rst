@@ -95,11 +95,6 @@ Deprecated
 Removed
 ~~~~~~~
 
-* The deprecated compatibility shims under *rally.plugins.common* (the
-  *exporters*, *hook*, *runners*, *scenarios*, *sla* and *verification*
-  subpackages, along with *rally.plugins.common.types*). Use the
-  *rally.plugins.task* and *rally.plugins.verification* packages instead.
-
 * Support for Python 3.9
 
 * ``rally deployment create --fromenv`` no longer special-cases
