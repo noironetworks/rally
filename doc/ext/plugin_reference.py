@@ -457,7 +457,7 @@ class PluginsReferenceDirective(rst.Directive):
     ) -> list:
         if base_name:
             title = (
-                f"%{base_name}"
+                f"{base_name}s"
                 if base_name[-1] != "y"
                 else f"{base_name[:-1]}ies"
             )
