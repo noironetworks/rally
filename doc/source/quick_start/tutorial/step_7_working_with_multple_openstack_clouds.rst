@@ -27,118 +27,100 @@ other that we know is registered with wrong credentials.
 .. code-block:: console
 
     $ . openrc admin admin  # openrc with correct credentials
-    $ rally deployment create --fromenv --name=cloud-1
-    +--------------------------------------+----------------------------+------------+------------------+--------+
-    | uuid                                 | created_at                 | name       | status           | active |
-    +--------------------------------------+----------------------------+------------+------------------+--------+
-    | 4251b491-73b2-422a-aecb-695a94165b5e | 2015-01-18 00:11:14.757203 | cloud-1    | deploy->finished |        |
-    +--------------------------------------+----------------------------+------------+------------------+--------+
-    Using deployment: 4251b491-73b2-422a-aecb-695a94165b5e
-    ~/.rally/openrc was updated
+    $ rally env create --name=cloud-1 --from-sysenv
+    Your system environment includes specifications of 1 platform(s).
+    Discovery information:
+         - existing@openstack : Available.
+    Using environment: 4251b491-73b2-422a-aecb-695a94165b5e
     ...
 
     $ . bad_openrc admin admin  # openrc with wrong credentials
-    $ rally deployment create --fromenv --name=cloud-2
-    +--------------------------------------+----------------------------+------------+------------------+--------+
-    | uuid                                 | created_at                 | name       | status           | active |
-    +--------------------------------------+----------------------------+------------+------------------+--------+
-    | 658b9bae-1f9c-4036-9400-9e71e88864fc | 2015-01-18 00:38:26.127171 | cloud-2    | deploy->finished |        |
-    +--------------------------------------+----------------------------+------------+------------------+--------+
-    Using deployment: 658b9bae-1f9c-4036-9400-9e71e88864fc
-    ~/.rally/openrc was updated
+    $ rally env create --name=cloud-2 --from-sysenv
+    Your system environment includes specifications of 1 platform(s).
+    Discovery information:
+         - existing@openstack : Available.
+    Using environment: 658b9bae-1f9c-4036-9400-9e71e88864fc
     ...
 
-Let us now list the deployments we have created:
+Note that *env create* does not talk to the cloud, so the second environment is
+created just fine despite the wrong credentials. It is *env check* below that
+tells the two apart.
+
+Let us now list the environments we have created:
 
 .. code-block:: console
 
-    $ rally deployment list
-    +--------------------------------------+----------------------------+------------+------------------+--------+
-    | uuid                                 | created_at                 | name       | status           | active |
-    +--------------------------------------+----------------------------+------------+------------------+--------+
-    | 4251b491-73b2-422a-aecb-695a94165b5e | 2015-01-05 00:11:14.757203 | cloud-1    | deploy->finished |        |
-    | 658b9bae-1f9c-4036-9400-9e71e88864fc | 2015-01-05 00:40:58.451435 | cloud-2    | deploy->finished | *      |
-    +--------------------------------------+----------------------------+------------+------------------+--------+
+    $ rally env list
+    +--------------------------------------+---------+--------+----------------------------+-------------+---------+
+    | uuid                                 | name    | status | created_at                 | description | default |
+    +--------------------------------------+---------+--------+----------------------------+-------------+---------+
+    | 658b9bae-1f9c-4036-9400-9e71e88864fc | cloud-2 | READY  | 2025-01-05T00:40:58.451435 |             | *       |
+    | 4251b491-73b2-422a-aecb-695a94165b5e | cloud-1 | READY  | 2025-01-05T00:11:14.757203 |             |         |
+    +--------------------------------------+---------+--------+----------------------------+-------------+---------+
 
-Note that the second is marked as **"active"** because this is the deployment
-we have created most recently. This means that it will be automatically (unless
-its UUID or name is passed explicitly via the *--deployment* parameter) used by
-the commands that need a deployment, like *rally task start ...* or *rally
-deployment check*:
+Note that the second one is marked as **"default"** because this is the
+environment we have created most recently. This means that it will be
+automatically (unless its UUID or name is passed explicitly via the *--env*
+parameter) used by the commands that need an environment, like *rally task
+start ...* or *rally env check*:
 
 .. code-block:: console
 
-    $ rally deployment check
-    Authentication Issues: wrong keystone credentials specified in your endpoint properties. (HTTP 401).
+    $ rally env check
+    Env `cloud-2 (658b9bae-1f9c-4036-9400-9e71e88864fc)' :-(
+    +-----------+-----------+-----------------------------------------------------------------------------------------------------------------------------------------------+
+    | Available | Platform  | Message                                                                                                                                       |
+    +-----------+-----------+-----------------------------------------------------------------------------------------------------------------------------------------------+
+    | :-(       | openstack | Failed to authenticate to http://example.net:5000/v3/ for user 'admin' in project 'admin': The request you have made requires authentication. |
+    +-----------+-----------+-----------------------------------------------------------------------------------------------------------------------------------------------+
 
-    $ rally deployment check --deployment=cloud-1
-    keystone endpoints are valid and following services are available:
-    +----------+----------------+-----------+
-    | services | type           | status    |
-    +----------+----------------+-----------+
-    | cinder   | volume         | Available |
-    | cinderv2 | volumev2       | Available |
-    | ec2      | ec2            | Available |
-    | glance   | image          | Available |
-    | heat     | orchestration  | Available |
-    | heat-cfn | cloudformation | Available |
-    | keystone | identity       | Available |
-    | nova     | compute        | Available |
-    | novav21  | computev21     | Available |
-    | s3       | s3             | Available |
-    +----------+----------------+-----------+
+    $ rally env check --env=cloud-1
+    Env `cloud-1 (4251b491-73b2-422a-aecb-695a94165b5e)' :-)
+    +-----------+-----------+---------+
+    | Available | Platform  | Message |
+    +-----------+-----------+---------+
+    | :-)       | openstack | OK!     |
+    +-----------+-----------+---------+
 
-You can also switch the active deployment using the **rally deployment use**
+You can also switch the default environment using the **rally env use**
 command:
 
 .. code-block:: console
 
-    $ rally deployment use cloud-1
-    Using deployment: 658b9bae-1f9c-4036-9400-9e71e88864fc
-    ~/.rally/openrc was updated
-    ...
+    $ rally env use cloud-1
+    Using environment: 4251b491-73b2-422a-aecb-695a94165b5e
 
-    $ rally deployment check
-    keystone endpoints are valid and following services are available:
-    +----------+----------------+-----------+
-    | services | type           | status    |
-    +----------+----------------+-----------+
-    | cinder   | volume         | Available |
-    | cinderv2 | volumev2       | Available |
-    | ec2      | ec2            | Available |
-    | glance   | image          | Available |
-    | heat     | orchestration  | Available |
-    | heat-cfn | cloudformation | Available |
-    | keystone | identity       | Available |
-    | nova     | compute        | Available |
-    | novav21  | computev21     | Available |
-    | s3       | s3             | Available |
-    +----------+----------------+-----------+
+    $ rally env check
+    Env `cloud-1 (4251b491-73b2-422a-aecb-695a94165b5e)' :-)
+    +-----------+-----------+---------+
+    | Available | Platform  | Message |
+    +-----------+-----------+---------+
+    | :-)       | openstack | OK!     |
+    +-----------+-----------+---------+
 
-Note the first two lines of the CLI output for the *rally deployment use*
-command. They tell you the UUID of the new active deployment and also say that
-the *~/.rally/openrc* file was updated -- this is the place where the "active"
-UUID is actually stored by Rally.
+Note the output of the *rally env use* command. It tells you the UUID of the
+new default environment, which is stored by Rally in the *~/.rally/globals*
+file.
 
-One last detail about managing different deployments in Rally is that the
+One last detail about managing different environments in Rally is that the
 *rally task list* command outputs only those tasks that were run against the
-currently active deployment, and you have to provide the *--all-deployments*
+current default environment, and you have to provide the *--all-envs*
 parameter to list all the tasks:
 
 .. code-block:: console
 
     $ rally task list
-    +--------------------------------------+-----------------+----------------------------+----------------+----------+--------+-----+
-    | uuid                                 | deployment_name | created_at                 | duration       | status   | failed | tag |
-    +--------------------------------------+-----------------+----------------------------+----------------+----------+--------+-----+
-    | c21a6ecb-57b2-43d6-bbbb-d7a827f1b420 | cloud-1         | 2015-01-05 01:00:42.099596 | 0:00:13.419226 | finished | False  |     |
-    | f6dad6ab-1a6d-450d-8981-f77062c6ef4f | cloud-1         | 2015-01-05 01:05:57.653253 | 0:00:14.160493 | finished | False  |     |
-    +--------------------------------------+-----------------+----------------------------+----------------+----------+--------+-----+
-    $ rally task list --all-deployment
-    +--------------------------------------+-----------------+----------------------------+----------------+----------+--------+-----+
-    | uuid                                 | deployment_name | created_at                 | duration       | status   | failed | tag |
-    +--------------------------------------+-----------------+----------------------------+----------------+----------+--------+-----+
-    | c21a6ecb-57b2-43d6-bbbb-d7a827f1b420 | cloud-1         | 2015-01-05 01:00:42.099596 | 0:00:13.419226 | finished | False  |     |
-    | f6dad6ab-1a6d-450d-8981-f77062c6ef4f | cloud-1         | 2015-01-05 01:05:57.653253 | 0:00:14.160493 | finished | False  |     |
-    | 6fd9a19f-5cf8-4f76-ab72-2e34bb1d4996 | cloud-2         | 2015-01-05 01:14:51.428958 | 0:00:15.042265 | finished | False  |     |
-    +--------------------------------------+-----------------+----------------------------+----------------+----------+--------+-----+
+    +--------------------------------------+-------------+---------------------+---------------+----------+--------+
+    | UUID                                 | Environment | Created at          | Load duration | Status   | Tag(s) |
+    +--------------------------------------+-------------+---------------------+---------------+----------+--------+
+    | c21a6ecb-57b2-43d6-bbbb-d7a827f1b420 | cloud-1     | 2025-01-05 01:00:42 | 13.419        | finished |        |
+    | f6dad6ab-1a6d-450d-8981-f77062c6ef4f | cloud-1     | 2025-01-05 01:05:57 | 14.160        | finished |        |
+    +--------------------------------------+-------------+---------------------+---------------+----------+--------+
+    $ rally task list --all-envs
+    +--------------------------------------+-------------+---------------------+---------------+----------+--------+
+    | UUID                                 | Environment | Created at          | Load duration | Status   | Tag(s) |
+    +--------------------------------------+-------------+---------------------+---------------+----------+--------+
+    | c21a6ecb-57b2-43d6-bbbb-d7a827f1b420 | cloud-1     | 2025-01-05 01:00:42 | 13.419        | finished |        |
+    | f6dad6ab-1a6d-450d-8981-f77062c6ef4f | cloud-1     | 2025-01-05 01:05:57 | 14.160        | finished |        |
+    | 6fd9a19f-5cf8-4f76-ab72-2e34bb1d4996 | cloud-2     | 2025-01-05 01:14:51 | 15.042        | finished |        |
+    +--------------------------------------+-------------+---------------------+---------------+----------+--------+

@@ -146,21 +146,25 @@ image names in this file with a variable:
 
 .. code-block:: yaml
 
-    ...
+    ---
+      version: 2
+      title: My scenarios
+      subtasks:
+        - title: Boot and delete a server
+          scenario:
+            NovaServers.boot_and_delete_server:
+              image:
+                name: {{ image_name }}
+              ...
+          ...
 
-    NovaServers.boot_and_delete_server:
-      -
-        args:
-          image:
-              name: {{image_name}}
-        ...
-
-    NovaServers.boot_and_list_server:
-      -
-        args:
-          image:
-              name: {{image_name}}
-        ...
+        - title: Boot and list servers
+          scenario:
+            NovaServers.boot_and_list_server:
+              image:
+                name: {{ image_name }}
+              ...
+          ...
 
 and create a file named *myscenario_args.yaml* that will define the parameter
 values:

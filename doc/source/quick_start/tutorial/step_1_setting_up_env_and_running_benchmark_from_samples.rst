@@ -31,83 +31,243 @@ have an already existing OpenStack deployment with Keystone available at
 
 Installing rally-openstack package
 ----------------------------------
-First, you have to provider Rally with `rally-openstack`_ package, to be done
+First, you have to provider Rally with `rally-openstack
+<https://github.com/openstack/rally-openstack>`_ package, to be done
 with ``pip install rally-openstack`` command.
 
 
-Registering an OpenStack deployment in Rally
---------------------------------------------
+Registering an OpenStack environment in Rally
+---------------------------------------------
 
 After successful installation, you have to provide Rally with an OpenStack
-deployment that should be tested. This should be done either through
-`OpenRC files`_ or through deployment `configuration files`_. In case you
-already have an *OpenRC*, it is extremely simple to register a deployment with
-the *deployment create* command:
+cloud that should be tested. Such cloud is described by an *environment spec*
+- a mapping where each key is a name of a platform plugin and each value is a
+configuration of that platform. The plugin that knows how to talk to an
+already deployed OpenStack cloud is `existing@openstack
+<../../plugins/plugin_reference.html#existing-platform>`_.
+
+In case you already have an `OpenRC file
+<https://docs.openstack.org/keystone/latest/admin/openrc.html>`_, there is no
+need to write the spec at all. The *env create* command with ``--from-sysenv``
+argument iterates over all available platform plugins and builds the spec
+based on the environment variables that are exported by *OpenRC*:
 
 .. code-block:: console
 
    $ . openrc admin admin
-   $ rally deployment create --fromenv --name=existing
-   +--------------------------------------+----------------------------+------------+------------------+--------+
-   | uuid                                 | created_at                 | name       | status           | active |
-   +--------------------------------------+----------------------------+------------+------------------+--------+
-   | 28f90d74-d940-4874-a8ee-04fda59576da | 2015-01-18 00:11:38.059983 | existing   | deploy->finished |        |
-   +--------------------------------------+----------------------------+------------+------------------+--------+
-   Using deployment : <Deployment UUID>
-   ...
+   $ rally env create --name=existing --from-sysenv
+   Your system environment includes specifications of 1 platform(s).
+   Discovery information:
+        - existing@openstack : Available.
+   Using environment: 4ea58e84-7d05-43da-b7e3-550b666f6b5e
+   +---------------------+------------------------------------------------+
+   | uuid                | 4ea58e84-7d05-43da-b7e3-550b666f6b5e           |
+   | name                | existing                                       |
+   | status              | READY                                          |
+   | created_at          | 2025-01-18T00:11:38.059983                     |
+   | updated_at          | 2025-01-18T00:11:38.071983                     |
+   | description         |                                                |
+   | extras              | {}                                             |
+   | platform: openstack | {                                              |
+   |                     |   "admin": {                                   |
+   |                     |     "username": "admin",                       |
+   |                     |     "password": "myadminpass",                 |
+   |                     |     "user_domain_name": "Default",             |
+   |                     |     "project_domain_name": "Default",          |
+   |                     |     "tenant_name": "admin",                    |
+   |                     |     "auth_url": "http://example.net:5000/v3/", |
+   |                     |     "endpoint_type": "public",                 |
+   |                     |     "region_name": "RegionOne",                |
+   |                     |     "https_cacert": "",                        |
+   |                     |     "https_cert": "",                          |
+   |                     |     "https_key": "",                           |
+   |                     |     "https_insecure": false,                   |
+   |                     |     "profiler_hmac_key": null,                 |
+   |                     |     "profiler_conn_str": null,                 |
+   |                     |     "domain_name": null                        |
+   |                     |   },                                           |
+   |                     |   "users": [],                                 |
+   |                     |   "api_info": {                                |
+   |                     |     "keystone": {                              |
+   |                     |       "version": 3,                            |
+   |                     |       "service_type": "identityv3"             |
+   |                     |     }                                          |
+   |                     |   }                                            |
+   |                     | }                                              |
+   +---------------------+------------------------------------------------+
 
-Alternatively, you can put the information about your cloud credentials into a
-JSON configuration file (let's call it `existing.json`_). The *deployment
-create* command has a slightly different syntax in this case:
+Alternatively, you can write the spec yourself and store it in a JSON or YAML
+file (let's call it *existing.json*). See `more samples
+<https://github.com/openstack/rally-openstack/tree/master/samples/deployments>`_
+for other ways to describe the same cloud:
+
+.. code-block:: json
+
+    {
+        "existing@openstack": {
+            "auth_url": "http://example.net:5000/v3/",
+            "region_name": "RegionOne",
+            "endpoint_type": "public",
+            "admin": {
+                "username": "admin",
+                "password": "myadminpass",
+                "user_domain_name": "Default",
+                "project_name": "admin",
+                "project_domain_name": "Default"
+            },
+            "https_insecure": false,
+            "https_cacert": ""
+        }
+    }
+
+The *env create* command accepts such file via ``--spec`` argument:
 
 .. code-block:: console
 
-   $ rally deployment create --file=existing.json --name=existing
-   +--------------------------------------+----------------------------+------------+------------------+--------+
-   | uuid                                 | created_at                 | name       | status           | active |
-   +--------------------------------------+----------------------------+------------+------------------+--------+
-   | 28f90d74-d940-4874-a8ee-04fda59576da | 2015-01-18 00:11:38.059983 | existing   | deploy->finished |        |
-   +--------------------------------------+----------------------------+------------+------------------+--------+
-   Using deployment : <Deployment UUID>
-   ...
+   $ rally env create --name=existing --spec existing.json
+   Using environment: 87c1dada-de7b-4627-aa12-fb5f127da9fa
+   +---------------------+------------------------------------------------+
+   | uuid                | 87c1dada-de7b-4627-aa12-fb5f127da9fa           |
+   | name                | existing                                       |
+   | status              | READY                                          |
+   | created_at          | 2025-01-18T00:11:38.059983                     |
+   | updated_at          | 2025-01-18T00:11:38.071983                     |
+   | description         |                                                |
+   | extras              | {}                                             |
+   | platform: openstack | {                                              |
+   |                     |   "admin": {                                   |
+   |                     |     "username": "admin",                       |
+   |                     |     "password": "myadminpass",                 |
+   |                     |     "user_domain_name": "Default",             |
+   |                     |     "project_domain_name": "Default",          |
+   |                     |     "tenant_name": "admin",                    |
+   |                     |     "auth_url": "http://example.net:5000/v3/", |
+   |                     |     "region_name": "RegionOne",                |
+   |                     |     "endpoint_type": "public",                 |
+   |                     |     "https_insecure": false,                   |
+   |                     |     "https_cacert": "",                        |
+   |                     |     "domain_name": null                        |
+   |                     |   },                                           |
+   |                     |   "users": []                                  |
+   |                     | }                                              |
+   +---------------------+------------------------------------------------+
+
+Note the *"Using environment"* line in the output. It says that the just
+created environment is now the default one; that means that all task or verify
+commands are going to be run against it. Later in tutorial is described how to
+use multiple environments.
 
 
-Note the last line in the output. It says that the just created deployment is
-now used by Rally; that means that all tasks or verify commands are going to be
-run against it. Later in tutorial is described how to use multiple deployments.
+Specifying versions of OpenStack APIs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, the *deployment check* command enables you to verify that your current
-deployment is healthy and ready to be tested:
+By default Rally discovers what version of each OpenStack API to use based on
+the Keystone service catalog. The optional ``api_info`` subkey of the spec
+allows to pin the version and the service type explicitly. This is what
+``--from-sysenv`` did for *keystone* in the example above, and the same can be
+done for any other client:
+
+.. code-block:: json
+
+    {
+        "existing@openstack": {
+            "auth_url": "http://example.net:5000/v3/",
+            "admin": {
+                "username": "admin",
+                "password": "myadminpass",
+                "user_domain_name": "Default",
+                "project_name": "admin",
+                "project_domain_name": "Default"
+            },
+            "api_info": {
+                "cinder": {
+                    "version": 3,
+                    "service_type": "volumev3"
+                }
+            }
+        }
+    }
+
+Whatever is listed in ``api_info`` applies to the whole environment. If
+different subtasks of a single task should be executed against different API
+versions, use `api_versions@openstack
+<../../plugins/plugin_reference.html#api-versions-context>`_ context instead -
+it accepts the same options, but is set per workload.
+
+
+Checking the environment
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, the *env check* command enables you to verify that your current
+environment is healthy and ready to be tested:
 
 .. code-block:: console
 
-   $ rally deployment check
-   keystone endpoints are valid and following services are available:
-   +----------+----------------+-----------+
-   | Service  | Service Type   | Status    |
-   +----------+----------------+-----------+
-   | cinder   | volume         | Available |
-   | cinderv2 | volumev2       | Available |
-   | ec2      | ec2            | Available |
-   | glance   | image          | Available |
-   | heat     | orchestration  | Available |
-   | heat-cfn | cloudformation | Available |
-   | keystone | identity       | Available |
-   | nova     | compute        | Available |
-   | novav21  | computev21     | Available |
-   | s3       | s3             | Available |
-   +----------+----------------+-----------+
+   $ rally env check
+   Env `existing (87c1dada-de7b-4627-aa12-fb5f127da9fa)' :-)
+   +-----------+-----------+---------+
+   | Available | Platform  | Message |
+   +-----------+-----------+---------+
+   | :-)       | openstack | OK!     |
+   +-----------+-----------+---------+
+
+While *env check* only answers whether the cloud is reachable, the *env info*
+command asks each platform for the details it can discover. For OpenStack it
+is a list of services available in the cloud:
+
+.. code-block:: console
+
+   $ rally env info
+   Env `existing (87c1dada-de7b-4627-aa12-fb5f127da9fa)'
+   +--------------------+-------------------------------+-------+
+   | platform           | info                          | error |
+   +--------------------+-------------------------------+-------+
+   | existing@openstack | {                             |       |
+   |                    |   "services": [               |       |
+   |                    |     {                         |       |
+   |                    |       "type": "compute",      |       |
+   |                    |       "name": "nova"          |       |
+   |                    |     },                        |       |
+   |                    |     {                         |       |
+   |                    |       "type": "identity",     |       |
+   |                    |       "name": "keystone"      |       |
+   |                    |     },                        |       |
+   |                    |     {                         |       |
+   |                    |       "type": "image",        |       |
+   |                    |       "name": "glance"        |       |
+   |                    |     },                        |       |
+   |                    |     {                         |       |
+   |                    |       "type": "network",      |       |
+   |                    |       "name": "neutron"       |       |
+   |                    |     },                        |       |
+   |                    |     {                         |       |
+   |                    |       "type": "object-store", |       |
+   |                    |       "name": "swift"         |       |
+   |                    |     },                        |       |
+   |                    |     {                         |       |
+   |                    |       "type": "placement",    |       |
+   |                    |       "name": "placement"     |       |
+   |                    |     },                        |       |
+   |                    |     {                         |       |
+   |                    |       "type": "volumev3",     |       |
+   |                    |       "name": "cinderv3"      |       |
+   |                    |     }                         |       |
+   |                    |   ]                           |       |
+   |                    | }                             |       |
+   +--------------------+-------------------------------+-------+
 
 
 Running Rally Tasks
 -------------------
 
-Now that we have a working and registered deployment, we can start testing
+Now that we have a working and registered environment, we can start testing
 it. The sequence of subtask to be launched by Rally should be specified in a
 *task input file* (either in *JSON* or in *YAML* format).
 Let's try one of the task sample available in
-`samples/tasks/scenarios`_, say, the one that boots and deletes multiple
-servers (*samples/tasks/scenarios/nova/boot-and-delete.json*):
+`samples/tasks/scenarios
+<https://github.com/openstack/rally/tree/master/samples/tasks/scenarios>`_,
+say, the one that boots and deletes multiple servers
+(*samples/tasks/scenarios/nova/boot-and-delete.json*):
 
 
 .. code-block:: json
@@ -216,12 +376,12 @@ Note that the Rally input task above uses *regular expressions* to specify the
 image and flavor name to be used for server creation, since concrete names
 might differ from installation to installation. If this task fails, then the
 reason for that might a non-existing image/flavor specified in the task.
-To check what images/flavors are available in the deployment, you might use the
+To check what images/flavors are available in the environment, you might use
 the following commands:
 
 .. code-block:: console
 
-   $ . ~/.rally/openrc
+   $ . openrc admin admin
    $ openstack image list
    +--------------------------------------+---------------------------------+--------+
    | ID                                   | Name                            | Status |
@@ -302,11 +462,3 @@ information about its single points by hovering the cursor over these points.
 
 Take some time to play around with these graphs
 and then move on to :ref:`the next step of our tutorial <tutorial_step_2_input_task_format>`.
-
-.. references:
-
-.. _rally-openstack: https://github.com/openstack/rally-openstack
-.. _OpenRC files: http://docs.openstack.org/user-guide/content/cli_openrc.html
-.. _configuration files: https://github.com/openstack/rally-openstack/tree/master/samples/deployments
-.. _existing.json: https://github.com/openstack/rally-openstack/tree/master/samples/deployments/existing.json
-.. _samples/tasks/scenarios: https://github.com/openstack/rally/tree/master/samples/tasks/scenarios

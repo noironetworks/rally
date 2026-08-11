@@ -64,7 +64,9 @@ extensions = [
     "ext.plugin_reference",
     "ext.include_vars"
 ]
-if not on_rtd:
+if on_rtd:
+    extensions.append("sphinx_rtd_theme")
+else:
     extensions.append("openstackdocstheme")
 
 todo_include_todos = True
@@ -139,10 +141,10 @@ pygments_style = "native"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-if not on_rtd:
-    html_theme = "openstackdocs"
+if on_rtd:
+    html_theme = "sphinx_rtd_theme"
 else:
-    html_theme = "default"
+    html_theme = "openstackdocs"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

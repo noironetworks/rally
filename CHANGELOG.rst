@@ -84,6 +84,9 @@ Changed
   cache)`` forms are detected automatically and keep working, with a
   deprecation warning. See the resource type plugin docs.
 
+* The documentation now uses ``rally env`` commands instead of the deprecated
+  ``rally deployment`` ones.
+
 
 Deprecated
 ~~~~~~~~~~

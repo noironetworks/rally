@@ -35,70 +35,120 @@ scenarios in Rally is just impossible in case of r/o Keystone backends like
 goes wrong, this won't affect the rest of the cloud users.
 
 
-Registering deployment with existing users in Rally
----------------------------------------------------
+Registering an environment with existing users in Rally
+-------------------------------------------------------
 
 The information about existing users in your OpenStack cloud should be passed
 to Rally at the
-:ref:`deployment initialization step <tutorial_step_1_setting_up_env_and_running_benchmark_from_samples>`.
-The difference from the deployment configuration we've seen previously is that
-you should set up the *"users"* section with the credentials of already
-existing users. Let's call this deployment configuration file
-*existing_users.json*:
+:ref:`environment initialization step <tutorial_step_1_setting_up_env_and_running_benchmark_from_samples>`.
+The difference from the environment spec we've seen previously is that you
+should set up the *"users"* section with the credentials of already existing
+users. Let's call this spec file *existing_users.json*:
 
 .. code-block:: json
 
     {
-         "openstack": {
-             "auth_url": "http://example.net:5000/v2.0/",
-             "region_name": "RegionOne",
-             "endpoint_type": "public",
-             "admin": {
-                 "username": "admin",
-                 "password": "pa55word",
-                 "tenant_name": "demo"
-             },
-             "users": [
-                 {
-                     "username": "b1",
-                     "password": "1234",
-                     "tenant_name": "testing"
-                 },
-                 {
-                     "username": "b2",
-                     "password": "1234",
-                     "tenant_name": "testing"
-                 }
-             ]
-         }
+        "existing@openstack": {
+            "auth_url": "http://example.net:5000/v3/",
+            "region_name": "RegionOne",
+            "endpoint_type": "public",
+            "admin": {
+                "username": "admin",
+                "password": "pa55word",
+                "user_domain_name": "Default",
+                "project_name": "demo",
+                "project_domain_name": "Default"
+            },
+            "users": [
+                {
+                    "username": "b1",
+                    "password": "1234",
+                    "user_domain_name": "Default",
+                    "project_name": "testing",
+                    "project_domain_name": "Default"
+                },
+                {
+                    "username": "b2",
+                    "password": "1234",
+                    "user_domain_name": "Default",
+                    "project_name": "testing",
+                    "project_domain_name": "Default"
+                }
+            ]
+        }
     }
 
-This deployment configuration requires some basic information about the
-OpenStack cloud like the region name, auth url. admin user credentials, and any
-amount of users already existing in the system. Rally will use their
-credentials to generate load in against this deployment as soon as we register
-it as usual:
+This spec requires some basic information about the OpenStack cloud like the
+region name, auth url, admin user credentials, and any amount of users already
+existing in the system. Rally will use their credentials to generate load
+against this cloud as soon as we register it as usual:
 
 .. code-block:: console
 
-    $ rally deployment create --file existing_users --name our_cloud
-    +--------------------------------------+----------------------------+-----------+------------------+--------+
-    | uuid                                 | created_at                 | name      | status           | active |
-    +--------------------------------------+----------------------------+-----------+------------------+--------+
-    | 1849a9bf-4b18-4fd5-89f0-ddcc56eae4c9 | 2015-03-28 02:43:27.759702 | our_cloud | deploy->finished |        |
-    +--------------------------------------+----------------------------+-----------+------------------+--------+
-    Using deployment: 1849a9bf-4b18-4fd5-89f0-ddcc56eae4c9
-    ~/.rally/openrc was updated
+    $ rally env create --name our_cloud --spec existing_users.json
+    Using environment: 1849a9bf-4b18-4fd5-89f0-ddcc56eae4c9
+    +---------------------+--------------------------------------------------+
+    | uuid                | 1849a9bf-4b18-4fd5-89f0-ddcc56eae4c9             |
+    | name                | our_cloud                                        |
+    | status              | READY                                            |
+    | created_at          | 2025-03-28T02:43:27.759702                       |
+    | updated_at          | 2025-03-28T02:43:27.771702                       |
+    | description         |                                                  |
+    | extras              | {}                                               |
+    | platform: openstack | {                                                |
+    |                     |   "admin": {                                     |
+    |                     |     "username": "admin",                         |
+    |                     |     "password": "pa55word",                      |
+    |                     |     "user_domain_name": "Default",               |
+    |                     |     "project_domain_name": "Default",            |
+    |                     |     "tenant_name": "demo",                       |
+    |                     |     "auth_url": "http://example.net:5000/v3/",   |
+    |                     |     "region_name": "RegionOne",                  |
+    |                     |     "endpoint_type": "public",                   |
+    |                     |     "domain_name": null,                         |
+    |                     |     "https_insecure": false,                     |
+    |                     |     "https_cacert": null                         |
+    |                     |   },                                             |
+    |                     |   "users": [                                     |
+    |                     |     {                                            |
+    |                     |       "username": "b1",                          |
+    |                     |       "password": "1234",                        |
+    |                     |       "user_domain_name": "Default",             |
+    |                     |       "project_domain_name": "Default",          |
+    |                     |       "tenant_name": "testing",                  |
+    |                     |       "auth_url": "http://example.net:5000/v3/", |
+    |                     |       "region_name": "RegionOne",                |
+    |                     |       "endpoint_type": "public",                 |
+    |                     |       "domain_name": null,                       |
+    |                     |       "https_insecure": false,                   |
+    |                     |       "https_cacert": null                       |
+    |                     |     },                                           |
+    |                     |     {                                            |
+    |                     |       "username": "b2",                          |
+    |                     |       "password": "1234",                        |
+    |                     |       "user_domain_name": "Default",             |
+    |                     |       "project_domain_name": "Default",          |
+    |                     |       "tenant_name": "testing",                  |
+    |                     |       "auth_url": "http://example.net:5000/v3/", |
+    |                     |       "region_name": "RegionOne",                |
+    |                     |       "endpoint_type": "public",                 |
+    |                     |       "domain_name": null,                       |
+    |                     |       "https_insecure": false,                   |
+    |                     |       "https_cacert": null                       |
+    |                     |     }                                            |
+    |                     |   ]                                              |
+    |                     | }                                                |
+    +---------------------+--------------------------------------------------+
 
-With this new deployment being active, Rally will use the already existing
-users instead of creating the temporary ones when launching task that do not
-specify the *"users"* context.
+With this new environment being the default one, Rally will use the already
+existing users instead of creating the temporary ones when launching task that
+do not specify the *"users"* context.
 
 
 Running tasks that uses existing users
 --------------------------------------
 
-After you have registered a deployment with existing users, don't forget to
+After you have registered an environment with existing users, don't forget to
 remove the *"users"* context from your task input file if you want
 to use existing users, like in the following configuration file
 (*boot-and-delete.json*):
