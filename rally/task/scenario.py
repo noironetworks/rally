@@ -304,7 +304,7 @@ class Scenario(
 
                 types_map[type_name] = types._compose_jsonschema(resource_cls)
 
-            schema["properties"][arg] = types_map[type_name]
+            schema["properties"][arg] = copy.deepcopy(types_map[type_name])
 
         return schema
 
