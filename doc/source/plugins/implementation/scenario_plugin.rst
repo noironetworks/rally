@@ -31,15 +31,17 @@ clients:
 
 .. code-block:: python
 
-    from rally import consts
-    from rally.plugins.openstack import scenario
     from rally.task import atomic
     from rally.task import validation
+
+    from rally_openstack.common import consts
+    from rally_openstack.task import scenario
 
 
     @validation.add("required_services", services=[consts.Service.NOVA])
     @validation.add("required_platform", platform="openstack", users=True)
-    @scenario.configure(name="ScenarioPlugin.list_flavors_useless")
+    @scenario.configure(name="ScenarioPlugin.list_flavors_useless",
+                        platform="openstack")
     class ListFlavors(scenario.OpenStackScenario):
         """Sample plugin which lists flavors."""
 

@@ -40,7 +40,7 @@ implement the Context API: the *setup()* method that creates a flavor and the
     from rally.task import context
     from rally.common import logging
     from rally import consts
-    from rally.plugins.openstack import osclients
+    from rally_openstack.common import osclients
 
     LOG = logging.getLogger(__name__)
 
