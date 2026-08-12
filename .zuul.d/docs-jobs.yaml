@@ -1,0 +1,27 @@
+- secret:
+    name: rally-rtd-credentials
+    data:
+      integration_token: !encrypted/pkcs1-oaep
+        - lAPW9bbEHF1sWD1XTgkvaalaQo0g5tsRXH/4ewfhWohgIu8nVq5tleLVmVrwP77uKXXl0
+          RxUJ/ouYtpoxYxvwqVCzk7R+rriYPg59dQYavI9kXxDmTlUfYp8jM6aeXJRE3KCpogYY9
+          fk+8CbWFwjA5cahuu0guhitM83czLBfy+c3cbnMXIqYQKPgbZJbtSGjhZe2pH10ovD/Uk
+          gVx7EenhoDt2PSyKXqpJ1Hu7TkoBTV9PLEY3BMDn9rIUA+pzX06N217XLjAhHsPzEEN2b
+          7ky4l0T9BlLRKWl7sdo2KgOr7Pnv6kb+dOjIihfn5BIvgHE+fuPQFokFwnYq2irvsTXB3
+          UIfNgi6Fs+ZWnuY9b+VBmwz73D7qzycITap6bj70joM7KtXG0isdIndzG8r2F4khTK4Gt
+          WJrWtd5rCFRffJistnHVjDK2WdW6/QvtuUanLgMVZ60fQxREamYn8dcZTMnbxcQf5jIUp
+          Z+gaxXQ9RqLiGgmfMP7Bgy4p3bKatC9i8+KtlMQ1XgZYp9TrVGoGuX7gseCp8JT+zDl2h
+          HXi/vrXZdvnvVzRBHbRekpt94CAIeiK8cHgYW6P3LgM6OW8aLGiHPQavMM8eGIU3QZGu4
+          NTrHR2CkWb+e4lu0lQSIQX1/95HaQD8Q7pwG89VwRUH0hYEY6TRMu1QHwSu/6w=
+
+- job:
+    name: rally-trigger-readthedocs
+    description: "Trigger a Read the Docs build of the rally documentation."
+    nodeset:
+      nodes: []
+    run: tests/ci/playbooks/trigger-rtd.yaml
+    secrets:
+      name: rtd_credentials
+      secret: rally-rtd-credentials
+    vars:
+      rtd_project_name: rally
+      rtd_webhook_id: "52691"

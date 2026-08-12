@@ -1,0 +1,31 @@
+- name: Trigger a Read the Docs build of the rally documentation
+  hosts: localhost
+  tasks:
+    - name: Ping the Read the Docs incoming webhook
+      no_log: true
+      uri:
+        url: https://readthedocs.org/api/v2/webhook/{{ rtd_project_name }}/{{ rtd_webhook_id }}/
+        method: "POST"
+        body_format: form-urlencoded
+        body:
+          token: "{{ rtd_credentials.integration_token }}"
+      register: rtd_response
+      delay: 5
+      retries: 3
+      until: rtd_response and rtd_response.status == 200
+      ignore_errors: true
+
+    - name: Ensure Read the Docs accepted the trigger
+      vars:
+        status: "{{ rtd_response.status | default('n/a') }}"
+        error: "{{ rtd_response.json.detail | default(rtd_response.msg | default('unknown error')) }}"
+      assert:
+        that: "rtd_response.status == 200"
+        fail_msg: "Failed to trigger a Read the Docs build (HTTP {{ status }}): {{ error }}"
+
+    - name: Ensure Read the Docs queued a build
+      assert:
+        that: "rtd_response.json.build_triggered | default(false)"
+        fail_msg: >-
+          Read the Docs accepted the webhook but queued no build:
+          {{ rtd_response.json | default('no response body') }}

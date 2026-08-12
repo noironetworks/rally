@@ -17,7 +17,7 @@ Changelog
 .. Release notes for existing releases are MUTABLE! If there is something that
    was missed or can be improved, feel free to change it!
 
-[5.1.0] - 2026-08-11
+[5.1.0] - 2026-08-12
 --------------------
 
 Added
@@ -106,7 +106,7 @@ Removed
 Fixed
 ~~~~~
 
-* Publishing to ReadTheDocs
+* Publishing to ReadTheDocs and docs.openstack.org/rally
 
 * Compatibility with paramiko 4+, which dropped the removed DSA key support.
 

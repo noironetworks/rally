@@ -1,13 +1,10 @@
 
 - project:
     templates:
-      - docs-on-readthedocs
-    vars:
-      rtd_webhook_id: "52691"
+      - publish-openstack-docs-pti
     check: &queue
       jobs:
         - rally-tox-cover
-        - rally-tox-docs
         - rally-tox-mypy
         - rally-tox-pep8
         - rally-tox-py310
@@ -54,6 +51,8 @@
         - rally-docker-build-and-push:
             vars:
               docker_image_version: latest
+        - rally-trigger-readthedocs
     release:
       jobs:
         - rally-docker-build-and-push
+        - rally-trigger-readthedocs
