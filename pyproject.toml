@@ -56,8 +56,8 @@ postgres = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["rally"]
-exclude = ["tests"]
+include = ["rally", "rally.*"]
+exclude = ["tests", "tests.*"]
 
 [project.scripts]
 rally = "rally.cli.main:main"

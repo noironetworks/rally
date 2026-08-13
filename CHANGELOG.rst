@@ -17,7 +17,18 @@ Changelog
 .. Release notes for existing releases are MUTABLE! If there is something that
    was missed or can be improved, feel free to change it!
 
-[5.1.0] - 2026-08-12
+[5.1.1] - 2026-08-13
+--------------------
+
+Fixed
+~~~~~
+
+* Added backward compatibility for subclasses of
+  ``rally.task.types.ResourceType`` that call parent's ``__init__`` method as
+  ``super().__init__(context, cache)``.
+  The proper deprecation warning is added.
+
+[5.1.0] - 2026-08-13
 --------------------
 
 Added

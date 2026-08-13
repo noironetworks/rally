@@ -1,3 +1,5 @@
+.eggs
+build
 tests
 contrib
 test-requirements.txt

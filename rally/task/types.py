@@ -228,11 +228,17 @@ def preprocess(
                     "scenario_cls"
                     in inspect.signature(resource_cls.__init__).parameters
                 ):
-                    resource_types[rtype] = resource_cls(
-                        context=context, cache=cache, scenario_cls=scenario_cls
+                    resource_types[rtype] = (
+                        resource_cls(  # type: ignore[abstract]
+                            context=context,
+                            cache=cache,
+                            scenario_cls=scenario_cls
+                        )
                     )
                 else:
-                    resource_types[rtype] = resource_cls(context, cache)  # type: ignore[call-arg]
+                    resource_types[rtype] = (
+                        resource_cls(context, cache)  # type: ignore[abstract]
+                    )
             except Exception:
                 raise exceptions.RallyException(
                     f"Failed to initialize '{rtype}' resource type."
@@ -299,15 +305,63 @@ class ResourceType(plugin.Plugin, metaclass=abc.ABCMeta):
     image name, regex or spec dict and returns a concrete image id.
     """
 
+    @t.overload
     def __init__(
         self,
         *,
         context: dict[str, t.Any],
         cache: dict[str, t.Any] | None = None,
-        scenario_cls: type[scenario.Scenario],
+        scenario_cls: type[scenario.Scenario] | None = None,
+    ) -> None: ...
+
+    @t.overload
+    def __init__(
+        self,
+        context: dict[str, t.Any],
+        cache: dict[str, t.Any] | None = None,
+        /,
+    ) -> None: ...
+
+    def __init__(
+        self,
+        *args: t.Any,
+        context: dict[str, t.Any] | None = None,
+        cache: dict[str, t.Any] | None = None,
+        scenario_cls: type[scenario.Scenario] | None = None,
     ) -> None:
+        """Initialize the pre-processor.
+
+        :param context: the workload context
+        :param cache: the cache shared by resource types of the workload
+        :param scenario_cls: the scenario plugin that owns the argument
+        """
+        if args:
+            LOG.warning(
+                f"Resource type '{self.get_name()}' passes arguments to "
+                f"ResourceType.__init__ positionally. It is deprecated "
+                f"since Rally 5.1.1, pass them as keyword arguments instead."
+            )
+            context = args[0]
+            if len(args) > 1:
+                cache = args[1]
+        if context is None:
+            raise TypeError(
+                f"Resource type '{self.get_name()}' is initialized without "
+                f"the required 'context' argument."
+            )
+        if scenario_cls is None:
+            LOG.warning(
+                f"Resource type '{self.get_name()}' is initialized without "
+                f"'scenario_cls' argument that is available since Rally "
+                f"5.1.0. Support of its absence will be removed in a future "
+                f"release."
+            )
+            from rally.task import scenario
+
+            scenario_cls = scenario.Scenario
+
         self._context = context
-        self._scenario_cls = scenario_cls
+        self._scenario_cls: type[scenario.Scenario] = scenario_cls
         self._global_cache = cache if cache is not None else {}
         self._global_cache.setdefault(self.get_name(), {})
         self._cache = self._global_cache[self.get_name()]
