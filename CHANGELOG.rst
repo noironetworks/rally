@@ -25,6 +25,10 @@ Added
 
 * Support for Python 3.14.
 
+* The new method is introduced to allow dropping finished atomic action.
+  The Rally plugin may make runtime decision whether to detach finished
+  atomic action from the final result by calling ``ActionTimer.discard()``.
+
 [5.2.0] - 2026-10-28
 --------------------
 

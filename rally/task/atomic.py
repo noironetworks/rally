@@ -111,6 +111,14 @@ class ActionTimer(utils.Timer):
         if type_:
             self.atomic_action["failed"] = True
 
+    def discard(self) -> None:
+        """Drop this finished action, children included, from the results."""
+        if "finished_at" not in self.atomic_action:
+            raise RuntimeError(
+                f"Atomic action '{self.name}' is still running and cannot "
+                f"be discarded.")
+        self._root.remove(self.atomic_action)
+
 
 def action_timer(
     name: str,

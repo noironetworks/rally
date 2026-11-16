@@ -111,6 +111,46 @@ class AtomicActionTestCase(test.TestCase):
                            "started_at": 1, "finished_at": 3}],
                          inst.atomic_actions())
 
+    @mock.patch("time.time", side_effect=[1, 2, 3, 4, 5, 6, 7, 8])
+    def test_action_timer_discard(self, mock_time):
+        inst = atomic.ActionTimerMixin()
+
+        with atomic.ActionTimer(inst, "parent"):
+            with atomic.ActionTimer(inst, "request") as request:
+                with atomic.ActionTimer(inst, "inner"):
+                    pass
+            request.discard()
+            with atomic.ActionTimer(inst, "next"):
+                pass
+
+        self.assertEqual([{"name": "parent",
+                           "started_at": 1,
+                           "finished_at": 8,
+                           "children": [{"name": "next",
+                                         "started_at": 6,
+                                         "finished_at": 7,
+                                         "children": []}]}],
+                         inst.atomic_actions())
+
+    @mock.patch("time.time", side_effect=[1, 2])
+    def test_action_timer_discard_top_level(self, mock_time):
+        inst = atomic.ActionTimerMixin()
+
+        with atomic.ActionTimer(inst, "test") as timer:
+            pass
+        timer.discard()
+
+        self.assertEqual([], inst.atomic_actions())
+
+    def test_action_timer_discard_running(self):
+        inst = atomic.ActionTimerMixin()
+
+        with atomic.ActionTimer(inst, "test") as timer:
+            self.assertRaises(RuntimeError, timer.discard)
+
+        self.assertEqual(["test"],
+                         [a["name"] for a in inst.atomic_actions()])
+
     def test_merge_atomic_actions(self):
         expected = [("foo", {"duration": 2, "count": 1,
                              "children": collections.OrderedDict()}),
