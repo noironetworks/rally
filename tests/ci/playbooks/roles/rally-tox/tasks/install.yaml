@@ -9,7 +9,7 @@
 - name: "Set python_exec var to {{ python_exec_from_tox }}"
   set_fact:
     python_exec: "{{ python_exec_from_tox.stdout.strip() }}"
-  when: python_exec_from_tox is defined and python_exec_from_tox.stdout.strip()
+  when: python_exec_from_tox is not skipped and python_exec_from_tox.stdout.strip() | length > 0
 
 - name: Install the proper python version and pip
   become: true

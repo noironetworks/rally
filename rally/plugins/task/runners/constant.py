@@ -286,10 +286,10 @@ class ConstantScenarioRunner(runner.ScenarioRunner):
         )
 
         result_queue: multiprocessing.Queue[runner.ScenarioRunnerResult] = (
-            multiprocessing.Queue()
+            runner.MP_CONTEXT.Queue()
         )
         event_queue: multiprocessing.Queue[dict[str, t.Any]] = (
-            multiprocessing.Queue()
+            runner.MP_CONTEXT.Queue()
         )
 
         def worker_args_gen(
@@ -411,10 +411,10 @@ class ConstantForDurationScenarioRunner(runner.ScenarioRunner):
         )
 
         result_queue: multiprocessing.Queue[runner.ScenarioRunnerResult] = (
-            multiprocessing.Queue()
+            runner.MP_CONTEXT.Queue()
         )
         event_queue: multiprocessing.Queue[dict[str, t.Any]] = (
-            multiprocessing.Queue()
+            runner.MP_CONTEXT.Queue()
         )
 
         def worker_args_gen(

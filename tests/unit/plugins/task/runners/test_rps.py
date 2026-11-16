@@ -299,14 +299,14 @@ class RPSScenarioRunnerTestCase(test.TestCase):
         for result in runner_obj.result_queue:
             self.assertIsNotNone(result)
 
-    @mock.patch(RUNNERS + "constant.multiprocessing.Queue")
+    @mock.patch("rally.task.runner.MP_CONTEXT.Queue")
     @mock.patch(RUNNERS + "rps.multiprocessing.cpu_count")
     @mock.patch(RUNNERS + "rps.RPSScenarioRunner._log_debug_info")
     @mock.patch(RUNNERS + "rps.RPSScenarioRunner._create_process_pool")
     @mock.patch(RUNNERS + "rps.RPSScenarioRunner._join_processes")
     def test_that_cpu_count_is_adjusted_properly(
             self, mock__join_processes, mock__create_process_pool,
-            mock__log_debug_info, mock_cpu_count, mock_queue):
+            mock__log_debug_info, mock_cpu_count, mock_mp_context_queue):
 
         samples = [
             {
@@ -375,7 +375,7 @@ class RPSScenarioRunnerTestCase(test.TestCase):
             mock_cpu_count.reset_mock()
             mock__create_process_pool.reset_mock()
             mock__join_processes.reset_mock()
-            mock_queue.reset_mock()
+            mock_mp_context_queue.reset_mock()
 
             mock_cpu_count.return_value = sample["real_cpu"]
 
@@ -400,7 +400,8 @@ class RPSScenarioRunnerTestCase(test.TestCase):
             self.assertIn(rps._worker_process, args)
             mock__join_processes.assert_called_once_with(
                 mock__create_process_pool.return_value,
-                mock_queue.return_value, mock_queue.return_value)
+                mock_mp_context_queue.return_value,
+                mock_mp_context_queue.return_value)
 
     def test_abort(self):
         config = {"times": 4, "rps": 10}

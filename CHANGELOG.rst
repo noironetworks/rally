@@ -17,6 +17,14 @@ Changelog
 .. Release notes for existing releases are MUTABLE! If there is something that
    was missed or can be improved, feel free to change it!
 
+[unreleased]
+------------
+
+Added
+~~~~~
+
+* Support for Python 3.14.
+
 [5.2.0] - 2026-10-28
 --------------------
 

@@ -703,7 +703,7 @@ def env_set_status(session, uuid, old_status, new_status):
 
 @with_session
 def env_delete_cascade(session, uuid):
-    task_uuids = sa.select(models.Task.uuid).where(
+    task_uuids: sa.Select[str] = sa.select(models.Task.uuid).where(
         models.Task.env_uuid == uuid
     )
     session.query(

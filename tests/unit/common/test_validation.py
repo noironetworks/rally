@@ -108,6 +108,8 @@ class ValidatorTestCase(test.TestCase):
         class Foo(DummyPluginBase):
             pass
 
+        self.addCleanup(Foo.unregister)
+
         result = DummyPluginBase.validate(self.id(), {}, {}, None,
                                           vtype="semantic")
         self.assertEqual(1, len(result))

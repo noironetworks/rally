@@ -150,7 +150,7 @@ class ConstantScenarioRunnerTestCase(test.TestCase):
         )
         self.assertEqual(0, len(runner_obj.result_queue))
 
-    @mock.patch(RUNNERS + "constant.multiprocessing.Queue")
+    @mock.patch("rally.task.runner.MP_CONTEXT.Queue")
     @mock.patch(RUNNERS + "constant.multiprocessing.cpu_count")
     @mock.patch(RUNNERS + "constant.ConstantScenarioRunner._log_debug_info")
     @mock.patch(
@@ -161,7 +161,7 @@ class ConstantScenarioRunnerTestCase(test.TestCase):
             mock__join_processes,
             mock__create_process_pool,
             mock__log_debug_info,
-            mock_cpu_count, mock_queue):
+            mock_cpu_count, mock_mp_context_queue):
 
         samples = [
             {
@@ -218,7 +218,7 @@ class ConstantScenarioRunnerTestCase(test.TestCase):
             mock_cpu_count.reset_mock()
             mock__create_process_pool.reset_mock()
             mock__join_processes.reset_mock()
-            mock_queue.reset_mock()
+            mock_mp_context_queue.reset_mock()
 
             mock_cpu_count.return_value = sample["real_cpu"]
 
@@ -244,7 +244,8 @@ class ConstantScenarioRunnerTestCase(test.TestCase):
             self.assertIn(constant._worker_process, args)
             mock__join_processes.assert_called_once_with(
                 mock__create_process_pool.return_value,
-                mock_queue.return_value, mock_queue.return_value)
+                mock_mp_context_queue.return_value,
+                mock_mp_context_queue.return_value)
 
     def test_abort(self):
         runner_obj = constant.ConstantScenarioRunner(self.task, self.config)

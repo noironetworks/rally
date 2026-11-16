@@ -228,7 +228,7 @@ class ScenarioRunnerTestCase(test.TestCase):
             processes_to_start, noop_worker_process, counter)
         self.assertEqual(processes_to_start, len(process_pool))
         for process in process_pool:
-            self.assertIsInstance(process, multiprocessing.Process)
+            self.assertIsInstance(process, multiprocessing.context.ForkProcess)
 
     @mock.patch(BASE + "ScenarioRunner._send_result")
     def test__join_processes(self, mock_scenario_runner__send_result):

@@ -11,14 +11,16 @@
         - rally-tox-py311
         - rally-tox-py312
         - rally-tox-py313
+        - rally-tox-py314
         - rally-tox-zuul-ansible-lint:
             files:
               - tests/ci/playbooks/*
         - rally-tox-samples
         - rally-tox-functional
         - rally-tox-functional-mariadb
-        - rally-tox-functional-postgresql
+        - rally-tox-functional-py314-postgresql
         - rally-tox-self
+        - rally-tox-self-py314
         - rally-install-ubuntu-noble
         - rally-docker-build
         # ensure rally-openstack is working with latest rally

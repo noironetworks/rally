@@ -53,6 +53,12 @@ class ScenarioRunnerResult(t.TypedDict):
 LOG = logging.getLogger(__name__)
 configure = plugin.configure
 
+# Worker processes must inherit the state the parent built at runtime: the
+# parsed configuration, the options registered by plugins, the loaded plugins
+# and the logging setup. Only "fork" provides it; "forkserver", the default
+# since Python 3.14, and "spawn" start workers from scratch.
+MP_CONTEXT = multiprocessing.get_context("fork")
+
 
 def format_result_on_timeout(
     exc: Exception, timeout: float
@@ -202,7 +208,7 @@ class ScenarioRunner(
         self.event_queue: collections.deque[dict[str, t.Any]] = (
             collections.deque()
         )
-        self.aborted = multiprocessing.Event()
+        self.aborted = MP_CONTEXT.Event()
         self.run_duration = 0.0
         self.batch_size = batch_size
         self.result_batch: list[ScenarioRunnerResult] = []
@@ -247,7 +253,7 @@ class ScenarioRunner(
         processes_to_start: int,
         worker_process: t.Callable[..., t.Any],
         worker_args_gen: t.Iterator[tuple[t.Any, ...]],
-    ) -> collections.deque[multiprocessing.Process]:
+    ) -> collections.deque[multiprocessing.process.BaseProcess]:
         """Create a pool of processes with some defined target function.
 
         :param processes_to_start: number of processes to create in the pool
@@ -255,16 +261,16 @@ class ScenarioRunner(
         :param worker_args_gen: generator of arguments for the target function
         :returns: the process pool as a deque
         """
-        process_pool: collections.deque[multiprocessing.Process] = (
-            collections.deque()
-        )
+        process_pool: collections.deque[
+            multiprocessing.process.BaseProcess
+        ] = collections.deque()
 
         for i in range(processes_to_start):
             kwrgs = {
                 "processes_to_start": processes_to_start,
                 "processes_counter": i,
             }
-            process = multiprocessing.Process(
+            process = MP_CONTEXT.Process(
                 target=worker_process,
                 args=next(worker_args_gen),
                 kwargs={"info": kwrgs},
@@ -276,7 +282,7 @@ class ScenarioRunner(
 
     def _join_processes(
         self,
-        process_pool: collections.deque[multiprocessing.Process],
+        process_pool: collections.deque[multiprocessing.process.BaseProcess],
         result_queue: multiprocessing.Queue[ScenarioRunnerResult],
         event_queue: multiprocessing.Queue[dict[str, t.Any]],
     ) -> None:

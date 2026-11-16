@@ -43,15 +43,17 @@
         RALLY_FUNCTIONAL_DB_URL: "mysql+pymysql://rally:rally@127.0.0.1/"
 
 - job:
-    name: rally-tox-functional-postgresql
+    name: rally-tox-functional-py314-postgresql
     parent: rally-tox-functional
     description: |
       Run functional tests for rally project against PostgreSQL.
 
-      Uses tox with the ``functional`` environment. Every test gets its own
-      database on the PostgreSQL server.
+      Uses tox with the ``functional`` environment under Python 3.14. Every
+      test gets its own database on the PostgreSQL server.
     pre-run: tests/ci/playbooks/functional-db-setup.yaml
+    nodeset: ubuntu-resolute-8GB
     vars:
+      python_exec: python3.14
       rally_functional_db: postgresql
       tox_environment:
         RALLY_FUNCTIONAL_DB_URL: "postgresql+psycopg://rally:rally@127.0.0.1/postgres"
@@ -65,6 +67,17 @@
       Uses tox with the ``self`` environment.
     vars:
       tox_env: self
+
+- job:
+    name: rally-tox-self-py314
+    parent: rally-tox-self
+    description: |
+      Run test for rally project.
+
+      Uses tox with the ``self`` environment under Python 3.14.
+    nodeset: ubuntu-resolute-8GB
+    vars:
+      python_exec: python3.14
 
 - job:
     name: rally-tox-py311
@@ -97,6 +110,17 @@
     vars:
       tox_env: py313
     nodeset: debian-trixie-8GB
+
+- job:
+    name: rally-tox-py314
+    parent: rally-tox-base
+    description: |
+      Run unit test for rally project.
+
+      Uses tox with the ``py314`` environment.
+    vars:
+      tox_env: py314
+    nodeset: ubuntu-resolute-8GB
 
 - job:
     name: rally-tox-mypy
